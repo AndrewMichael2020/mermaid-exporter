@@ -144,16 +144,36 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
         let { svg } = await mermaid.render("mermaid-download-svg-" + Date.now(), cleanCode);
         
         // Sanitize <br> tags to be XML-compliant
-        let svgContent = svg.replace(/<br>/g, '<br/>');
+        svg = svg.replace(/<br>/g, '<br/>');
+
+        // Add Padding by adjusting viewBox
+        const padding = 20;
+        svg = svg.replace(/viewBox="([^"]*)"/, (match, viewBox) => {
+            const parts = viewBox.split(' ').map(Number);
+            if (parts.length === 4) {
+                const [x, y, w, h] = parts;
+                const newX = x - padding;
+                const newY = y - padding;
+                const newW = w + (padding * 2);
+                const newH = h + (padding * 2);
+                return `viewBox="${newX} ${newY} ${newW} ${newH}"`;
+            }
+            return match;
+        });
 
         if (isDark) {
           // Inject a dark background rectangle into the SVG
-          const darkBgRect = `<rect x="0" y="0" width="100%" height="100%" fill="#1a1a1a"></rect>`;
-          const svgTagEnd = svgContent.indexOf('>') + 1;
-          svgContent = svgContent.slice(0, svgTagEnd) + darkBgRect + svgContent.slice(svgTagEnd);
+          const darkBgRect = `<rect x="-50%" y="-50%" width="200%" height="200%" fill="#1a1a1a"></rect>`;
+          const svgTagEnd = svg.indexOf('>') + 1;
+          svg = svg.slice(0, svgTagEnd) + darkBgRect + svg.slice(svgTagEnd);
+        } else {
+           // For light theme, optionally add a white background for consistent viewing
+           const whiteBgRect = `<rect x="-50%" y="-50%" width="200%" height="200%" fill="#ffffff"></rect>`;
+           const svgTagEnd = svg.indexOf('>') + 1;
+           svg = svg.slice(0, svgTagEnd) + whiteBgRect + svg.slice(svgTagEnd);
         }
 
-        const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+        const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
         const svgUrl = URL.createObjectURL(svgBlob);
         const downloadLink = document.createElement('a');
         downloadLink.href = svgUrl;
