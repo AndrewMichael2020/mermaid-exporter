@@ -45,14 +45,14 @@ export default function VizPage() {
     <div className="flex h-screen flex-col bg-background">
       <Header />
       <main className="flex flex-1 flex-col lg:flex-row gap-4 overflow-hidden p-4">
-        <div className="lg:w-1/3 flex flex-col min-h-0">
+        <div className="flex flex-1 flex-col lg:w-1/3 min-h-0">
           <DiagramEditor
             code={diagramCode}
             setCode={setDiagramCode}
             toast={toast}
           />
         </div>
-        <div className="lg:w-2/3 flex flex-col min-h-0">
+        <div className="flex flex-1 flex-col lg:w-2/3 min-h-0">
           {isMounted && (
             <DiagramViewer
               code={diagramCode}
