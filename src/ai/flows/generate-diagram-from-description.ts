@@ -32,6 +32,8 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert in Mermaid syntax.
 
   You will generate Mermaid code based on the user's description. Ensure the generated code is valid Mermaid code.
+  
+  IMPORTANT: Do not add any 'classDef', 'linkStyle', or other styling commands. The styling is handled by a theme selector.
 
   Description: {{{description}}}`,
 });

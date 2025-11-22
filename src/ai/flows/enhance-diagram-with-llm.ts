@@ -34,6 +34,8 @@ const enhanceDiagramWithLLMPrompt = ai.definePrompt({
 
   The user will provide you with a Mermaid diagram code and a prompt describing desired enhancements.
   Your task is to enhance the diagram code based on the prompt.
+  
+  IMPORTANT: Do not add any 'classDef', 'linkStyle', or other styling commands. The styling is handled by a theme selector.
 
   Original Diagram Code:
   '''mermaid
