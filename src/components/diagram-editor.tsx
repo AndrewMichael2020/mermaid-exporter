@@ -61,7 +61,7 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
   };
 
   return (
-    <Card className="flex flex-col flex-1 h-full shadow-lg">
+    <Card className="flex flex-col h-full shadow-lg">
       <CardContent className="p-0 flex flex-col flex-1">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
           <div className="p-4 border-b">
