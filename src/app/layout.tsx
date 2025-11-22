@@ -21,7 +21,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
       </head>
-      <body className="h-full font-body antialiased">
+      <body className="h-full font-body antialiased flex flex-col">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

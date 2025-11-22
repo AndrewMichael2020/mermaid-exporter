@@ -61,7 +61,7 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
   };
 
   return (
-    <Card className="flex flex-col h-full shadow-lg">
+    <Card className="flex flex-col flex-1 h-full shadow-lg">
       <CardContent className="p-0 flex flex-col flex-1">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
           <div className="p-4 border-b">
@@ -71,7 +71,7 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
               <TabsTrigger value="enhance"><Wand2 className="mr-1 sm:mr-2 h-4 w-4" /> Enhance</TabsTrigger>
             </TabsList>
           </div>
-          <TabsContent value="code" className="flex-1 flex flex-col m-0 p-4">
+          <TabsContent value="code" className="flex-1 flex flex-col m-0 p-4 space-y-4">
             <Textarea
               placeholder="Paste your Mermaid code here..."
               value={code}
