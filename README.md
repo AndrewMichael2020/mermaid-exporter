@@ -13,7 +13,7 @@ An AI-powered application to visualize, create, and enhance [Mermaid.js](https:/
 
 ## ✨ Features
 
-*   **Real-time Rendering**: Instantly visualize your Mermaid diagram code as you type.
+*   **Instant Rendering**: Instantly visualize your Mermaid diagram code as you type.
 *   **AI Diagram Generation**: Describe the diagram you want in plain English, and let AI generate the Mermaid code for you.
 *   **AI Diagram Enhancement**: Ask the AI to modify, improve, or add to your existing diagrams.
 *   **Code Editor**: A simple, clean editor for writing and editing your Mermaid syntax.
