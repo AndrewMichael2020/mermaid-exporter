@@ -26,6 +26,16 @@ export default function HomePage() {
     setIsMounted(true);
     // Log visit
     logUserActivity(user?.uid, 'visit_home_page');
+
+    // Check for template from Gallery
+    if (typeof window !== 'undefined') {
+      const template = sessionStorage.getItem('mermaid-template');
+      if (template) {
+        setDiagramCode(template);
+        sessionStorage.removeItem('mermaid-template');
+        logUserActivity(user?.uid, 'load_template_from_gallery');
+      }
+    }
   }, [user]);
 
   if (loading) {
