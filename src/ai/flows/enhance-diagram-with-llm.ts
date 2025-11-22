@@ -36,11 +36,14 @@ const enhanceDiagramWithLLMPrompt = ai.definePrompt({
   Your task is to enhance the diagram code based on the prompt.
   
   IMPORTANT: Do not add any 'classDef', 'linkStyle', or other styling commands. The styling is handled by a theme selector.
+  You will be penalized if you add any styling.
 
   Original Diagram Code:
   '''mermaid
   {{{diagramCode}}}
   '''
+
+  Enhancement Request: {{{enhancementPrompt}}}
 
   Please provide the full, enhanced Mermaid diagram code below.
   `,
@@ -62,6 +65,9 @@ const enhanceDiagramWithLLMFlow = ai.defineFlow(
     if (match) {
       enhancedCode = match[1].trim();
     }
+
+    // Also strip out any classDef that the model might have added.
+    enhancedCode = enhancedCode.replace(/^\s*classDef\s.*$/gm, '').trim();
 
     return {
       enhancedDiagramCode: enhancedCode,

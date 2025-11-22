@@ -37,7 +37,7 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
   const { toast } = useToast();
   const { resolvedTheme } = useNextTheme();
 
-  const isDark = selectedTheme === 'dark' || (resolvedTheme === 'dark' && selectedTheme !== 'light');
+  const isDark = selectedTheme === 'dark';
 
   useEffect(() => {
     const renderDiagram = async () => {
@@ -59,7 +59,9 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
 
         if (viewerRef.current && code) {
           try {
-            await mermaid.parse(code);
+            // Strip out classDef before parsing, as it can interfere with themes
+            const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
+            await mermaid.parse(cleanCode);
             setError(null);
           } catch(e: any) {
             setError(e.str || "Invalid Mermaid syntax. Please check your code.");
@@ -89,7 +91,7 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
     };
 
     renderDiagram();
-  }, [code, selectedTheme, resolvedTheme, isDark]);
+  }, [code, selectedTheme, isDark]);
   
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
@@ -115,12 +117,15 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
         }
         mermaid.initialize(config);
 
-        let { svg } = await mermaid.render("mermaid-download-svg-" + Date.now(), code);
+        const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
+
+        let { svg } = await mermaid.render("mermaid-download-svg-" + Date.now(), cleanCode);
         
         // Sanitize <br> tags to be XML-compliant
         let svgContent = svg.replace(/<br>/g, '<br/>');
 
         if (isDark) {
+          // Inject a dark background rectangle into the SVG
           const darkBgRect = `<rect x="0" y="0" width="100%" height="100%" fill="#1a1a1a"></rect>`;
           const svgTagEnd = svgContent.indexOf('>') + 1;
           svgContent = svgContent.slice(0, svgTagEnd) + darkBgRect + svgContent.slice(svgTagEnd);
