@@ -29,15 +29,16 @@ const enhanceDiagramWithLLMPrompt = ai.definePrompt({
   name: 'enhanceDiagramWithLLMPrompt',
   input: {schema: EnhanceDiagramWithLLMInputSchema},
   output: {schema: EnhanceDiagramWithLLMOutputSchema},
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert in Mermaid diagrams.
 
   The user will provide you with a Mermaid diagram code and a prompt describing desired enhancements.
   Your task is to enhance the diagram code based on the prompt.
 
   Original Diagram Code:
-  \'\'\'mermaid
+  '''mermaid
   {{{diagramCode}}}
-  \'\'\'
+  '''
 
   Please provide the full, enhanced Mermaid diagram code below.
   `,
@@ -54,7 +55,7 @@ const enhanceDiagramWithLLMFlow = ai.defineFlow(
     
     let enhancedCode = output!.enhancedDiagramCode;
     // The model sometimes wraps the code in ```mermaid ... ```, so we should strip that.
-    const codeBlockRegex = /\'\'\'(?:mermaid)?\s*([\s\S]*?)\s*\'\'\'/;
+    const codeBlockRegex = /'''(?:mermaid)?\s*([\s\S]*?)\s*'''/;
     const match = codeBlockRegex.exec(enhancedCode);
     if (match) {
       enhancedCode = match[1].trim();
