@@ -49,7 +49,8 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
           theme: isDark ? 'dark' : 'default',
           securityLevel: 'loose',
           fontFamily: 'Inter, sans-serif',
-          suppressErrorRendering: true // This will hide the floating error messages
+          // Suppress the default error messages to rely on our own UI
+          suppressErrorRendering: true,
         };
 
         if (isDark) {
@@ -60,12 +61,14 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
 
         if (viewerRef.current && code) {
           try {
+            // The model sometimes adds classDef, which can interfere with themes.
+            // We will strip it before parsing to be safe.
             const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
             await mermaid.parse(cleanCode); // validation
             
             const { svg } = await mermaid.render(
               "mermaid-svg-" + Date.now(),
-              cleanCode
+              cleanCode // Use cleaned code
             );
             
             if (viewerRef.current) {
@@ -100,9 +103,10 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
       await navigator.clipboard.writeText(code);
       toast({ title: 'Copied to clipboard!', description: 'Mermaid code has been copied.' });
     } catch (err) {
+      // Fallback for when navigator.clipboard is not available
       const textArea = document.createElement("textarea");
       textArea.value = code;
-      textArea.style.position = "fixed";
+      textArea.style.position = "fixed";  // Avoid scrolling to bottom
       textArea.style.left = "-9999px";
       document.body.appendChild(textArea);
       textArea.focus();
@@ -141,8 +145,10 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
 
         let { svg } = await mermaid.render("mermaid-download-svg-" + Date.now(), cleanCode);
         
+        // Sanitize <br> tags to be XML-compliant
         svg = svg.replace(/<br>/g, '<br/>');
 
+        // Add Padding by adjusting viewBox
         const padding = 20;
         svg = svg.replace(/viewBox="([^"]*)"/, (match, viewBox) => {
             const parts = viewBox.split(' ').map(Number);
@@ -158,10 +164,12 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
         });
 
         if (isDark) {
+          // Inject a dark background rectangle into the SVG
           const darkBgRect = `<rect x="-50%" y="-50%" width="200%" height="200%" fill="#1a1a1a"></rect>`;
           const svgTagEnd = svg.indexOf('>') + 1;
           svg = svg.slice(0, svgTagEnd) + darkBgRect + svg.slice(svgTagEnd);
         } else {
+           // For light theme, optionally add a white background for consistent viewing
            const whiteBgRect = `<rect x="-50%" y="-50%" width="200%" height="200%" fill="#ffffff"></rect>`;
            const svgTagEnd = svg.indexOf('>') + 1;
            svg = svg.slice(0, svgTagEnd) + whiteBgRect + svg.slice(svgTagEnd);
