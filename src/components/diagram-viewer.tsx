@@ -21,16 +21,15 @@ interface DiagramViewerProps {
 }
 
 const darkThemeVariables = {
-    background: '#1a1a1a',
-    primaryColor: '#2e2e2e',
-    primaryTextColor: '#f0f0f0',
+    background: '#333',
+    primaryColor: '#333',
+    primaryTextColor: '#fff',
     lineColor: '#888888',
     textColor: '#f0f0f0',
     nodeBorder: '#888888',
     mainBkg: '#333333',
-    nodeTextColor: '#f0f0f0',
+    nodeTextColor: '#fff',
 };
-
 
 export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: DiagramViewerProps) {
   const viewerRef = useRef<HTMLDivElement>(null);
@@ -38,8 +37,7 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
   const { toast } = useToast();
   const { resolvedTheme } = useNextTheme();
 
-  const effectiveTheme = selectedTheme === 'dark' || (selectedTheme === 'default' && resolvedTheme === 'dark') ? 'dark' : 'light';
-  const isDark = effectiveTheme === 'dark';
+  const isDark = selectedTheme === 'dark' || (resolvedTheme === 'dark' && selectedTheme !== 'light');
 
   useEffect(() => {
     const renderDiagram = async () => {
@@ -117,10 +115,16 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
         }
         mermaid.initialize(config);
 
-        const { svg } = await mermaid.render("mermaid-download-svg-" + Date.now(), code);
+        let { svg } = await mermaid.render("mermaid-download-svg-" + Date.now(), code);
         
         // Sanitize <br> tags to be XML-compliant
-        const svgContent = svg.replace(/<br>/g, '<br/>');
+        let svgContent = svg.replace(/<br>/g, '<br/>');
+
+        if (isDark) {
+          const darkBgRect = `<rect x="0" y="0" width="100%" height="100%" fill="#1a1a1a"></rect>`;
+          const svgTagEnd = svgContent.indexOf('>') + 1;
+          svgContent = svgContent.slice(0, svgTagEnd) + darkBgRect + svgContent.slice(svgTagEnd);
+        }
 
         const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
         const svgUrl = URL.createObjectURL(svgBlob);
