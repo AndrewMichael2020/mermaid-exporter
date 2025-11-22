@@ -28,7 +28,7 @@ const prompt = ai.definePrompt({
   name: 'generateDiagramPrompt',
   input: {schema: GenerateDiagramInputSchema},
   output: {schema: GenerateDiagramOutputSchema},
-  model: 'googleai/gemini-1.5-flash-latest',
+  model: 'googleai/gemini-2.5-flash-lite',
   prompt: `You are an expert in Mermaid syntax.
 
   You will generate Mermaid code based on the user's description. Ensure the generated code is valid Mermaid code.
