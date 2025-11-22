@@ -11,10 +11,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Code, LogIn, LogOut } from "lucide-react";
+import { LogIn, LogOut } from "lucide-react";
 import type { User } from "@/contexts/auth";
 import Image from "next/image";
-import logo from "@/public/logo.png";
 
 export default function Header() {
   const { user, signIn, signOut } = useAuth();
@@ -22,7 +21,7 @@ export default function Header() {
   return (
     <header className="flex h-16 items-center justify-between border-b bg-card px-4 sm:px-6 shrink-0">
       <div className="flex items-center gap-3">
-        <Image src={logo} alt="logo" width={32} height={32} />
+        <Image src="/logo.png" alt="logo" width={32} height={32} />
         <h1 className="text-xl font-bold tracking-tight font-headline">Mermaid Cloud Viz</h1>
       </div>
       {user ? (
