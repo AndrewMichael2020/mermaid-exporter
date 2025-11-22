@@ -46,6 +46,17 @@ const generateDiagramFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
+    
+    // Sanitize the output to remove unwanted styling commands
+    if (output && output.mermaidCode) {
+      output.mermaidCode = output.mermaidCode
+        .replace(/^\s*classDef\s.*$/gm, '')
+        .replace(/^\s*linkStyle\s.*$/gm, '')
+        .replace(/```mermaid/g, '')
+        .replace(/```/g, '')
+        .trim();
+    }
+    
     return output!;
   }
 );
