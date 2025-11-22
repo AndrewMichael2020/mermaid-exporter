@@ -76,7 +76,7 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
               placeholder="Paste your Mermaid code here..."
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="flex-1 font-mono text-sm"
+              className="flex-1 font-mono text-sm resize-none"
               aria-label="Mermaid code editor"
             />
           </TabsContent>
@@ -85,10 +85,10 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
               placeholder="Describe the diagram you want to create... e.g., 'a flowchart with a start node, a decision node, and two end nodes'"
               value={generateDescription}
               onChange={(e) => setGenerateDescription(e.target.value)}
-              className="flex-1"
+              className="flex-1 resize-none"
               aria-label="Diagram generation description"
             />
-            <Button onClick={handleGenerate} disabled={isGenerating}>
+            <Button onClick={handleGenerate} disabled={isGenerating} className="shrink-0">
               {isGenerating ? <RotateCw className="mr-2 h-4 w-4 animate-spin" /> : <BrainCircuit className="mr-2 h-4 w-4" />}
               {isGenerating ? "Generating..." : "Generate with AI"}
             </Button>
@@ -98,10 +98,10 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
               placeholder="Describe how you want to enhance the current diagram... e.g., 'add a new step after the decision node' or 'change the color of the start node to red'"
               value={enhancePrompt}
               onChange={(e) => setEnhancePrompt(e.target.value)}
-              className="flex-1"
+              className="flex-1 resize-none"
               aria-label="Diagram enhancement prompt"
             />
-            <Button onClick={handleEnhance} disabled={isEnhancing}>
+            <Button onClick={handleEnhance} disabled={isEnhancing} className="shrink-0">
               {isEnhancing ? <RotateCw className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
               {isEnhancing ? "Enhancing..." : "Enhance with AI"}
             </Button>
