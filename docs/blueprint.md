@@ -1,0 +1,19 @@
+# **App Name**: Mermaid Cloud Viz
+
+## Core Features:
+
+- Mermaid Diagram Input: Allow users to input Mermaid diagram code via text area or URL.
+- Real-time Visualization: Dynamically render the Mermaid diagram based on the input code using Next.js.
+- Visualization Options: Offer several built-in diagram themes/styles for enhanced visualization. Implement functionality for the LLM to act as a 'tool', incorporating information regarding diagram parameters (i.e. parameters a user can specify) to enhance the rendered diagram based on user needs.
+- Google Authentication: Secure the application behind Google Authentication to control access.
+- Cloud Run Deployment: Deploy the Next.js application to Cloud Run in the specified project (agents-mcp-training).
+
+## Style Guidelines:
+
+- Primary color: Dark Indigo (#4B0082), evokes professionalism and intelligence, ideal for data visualization.
+- Background color: Light Gray (#F0F0F0), provides a neutral backdrop, allowing diagrams to stand out.
+- Accent color: Deep Purple (#9400D3), adds visual interest and highlights interactive elements.
+- Body and headline font: 'Inter', sans-serif, for a clean, readable, modern UI.
+- Use clean, minimalist icons for diagram elements and actions.
+- Employ a clean, intuitive layout to make the app easy to use.
+- Implement smooth transitions and subtle animations to enhance user experience.
