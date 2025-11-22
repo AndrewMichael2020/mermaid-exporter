@@ -16,7 +16,12 @@ import {
   enhanceDiagramWithLLM,
 } from "@/ai/flows";
 
-export default function DiagramEditor({ code, onCodeChange }) {
+interface DiagramEditorProps {
+  code: string;
+  onCodeChange: (newCode: string) => void;
+}
+
+export default function DiagramEditor({ code, onCodeChange }: DiagramEditorProps) {
   const [activeTab, setActiveTab] = useState("code");
   const [generateDescription, setGenerateDescription] = useState("");
   const [enhancePrompt, setEnhancePrompt] = useState("");

@@ -62,21 +62,23 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
             // The model sometimes adds classDef, which can interfere with themes.
             // We will strip it before parsing to be safe.
             const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
-            await mermaid.parse(cleanCode);
+            await mermaid.parse(cleanCode); // validation
+            
+            const { svg } = await mermaid.render(
+              "mermaid-svg-" + Date.now(),
+              cleanCode // Use cleaned code
+            );
+            
+            if (viewerRef.current) {
+              viewerRef.current.innerHTML = svg;
+            }
             setError(null);
           } catch(e: any) {
-            setError(e.str || "Invalid Mermaid syntax. Please check your code.");
-            if (viewerRef.current) viewerRef.current.innerHTML = '';
-            return;
-          }
-
-          const { svg } = await mermaid.render(
-            "mermaid-svg-" + Date.now(),
-            code
-          );
-
-          if (viewerRef.current) {
-            viewerRef.current.innerHTML = svg;
+            console.error("Mermaid rendering error:", e);
+            setError(e.message || e.str || "Invalid Mermaid syntax. Please check your code.");
+            if (viewerRef.current) {
+              viewerRef.current.innerHTML = '';
+            }
           }
         } else if (viewerRef.current) {
           viewerRef.current.innerHTML = '';
