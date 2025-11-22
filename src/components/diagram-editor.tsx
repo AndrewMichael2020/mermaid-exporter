@@ -109,14 +109,13 @@ export default function DiagramEditor({ code, onCodeChange }: DiagramEditorProps
               aria-label="Mermaid code editor"
             />
           </TabsContent>
-          <TabsContent value="generate" className="p-4 flex flex-col gap-4">
+          <TabsContent value="generate" className="p-4 flex flex-col gap-4 flex-1">
             <Textarea
               placeholder="Describe the diagram you want to create... e.g., 'a flowchart with a start node, a decision node, and two end nodes'"
               value={generateDescription}
               onChange={(e) => setGenerateDescription(e.target.value)}
-              className="w-full resize-y"
+              className="w-full resize-y flex-1"
               aria-label="Diagram generation description"
-              rows={25}
             />
             <Button
               onClick={handleGenerate}
@@ -131,14 +130,13 @@ export default function DiagramEditor({ code, onCodeChange }: DiagramEditorProps
               {isGenerating ? "Generating..." : "Generate with AI"}
             </Button>
           </TabsContent>
-          <TabsContent value="enhance" className="p-4 flex flex-col gap-4">
+          <TabsContent value="enhance" className="p-4 flex flex-col gap-4 flex-1">
             <Textarea
               placeholder="Describe how you want to enhance the current diagram... e.g., 'add a new step after the decision node' or 'change the color of the start node to red'"
               value={enhancePrompt}
               onChange={(e) => setEnhancePrompt(e.target.value)}
-              className="w-full resize-y"
+              className="w-full resize-y flex-1"
               aria-label="Diagram enhancement prompt"
-              rows={25}
             />
             <Button
               onClick={handleEnhance}
