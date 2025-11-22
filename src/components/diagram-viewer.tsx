@@ -59,7 +59,8 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
 
         if (viewerRef.current && code) {
           try {
-            // Strip out classDef before parsing, as it can interfere with themes
+            // The model sometimes adds classDef, which can interfere with themes.
+            // We will strip it before parsing to be safe.
             const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
             await mermaid.parse(cleanCode);
             setError(null);
@@ -93,9 +94,28 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
     renderDiagram();
   }, [code, selectedTheme, isDark]);
   
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code);
-    toast({ title: 'Copied to clipboard!', description: 'Mermaid code has been copied.' });
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      toast({ title: 'Copied to clipboard!', description: 'Mermaid code has been copied.' });
+    } catch (err) {
+      // Fallback for when navigator.clipboard is not available
+      const textArea = document.createElement("textarea");
+      textArea.value = code;
+      textArea.style.position = "fixed";  // Avoid scrolling to bottom
+      textArea.style.left = "-9999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        toast({ title: 'Copied to clipboard!', description: 'Mermaid code has been copied.' });
+      } catch (copyErr) {
+        console.error('Fallback copy failed', copyErr);
+        toast({ title: 'Copy failed', description: 'Could not copy code to clipboard.', variant: 'destructive' });
+      }
+      document.body.removeChild(textArea);
+    }
   }
 
   const handleDownload = async () => {
@@ -173,7 +193,7 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
             </Button>
         </div>
       </CardHeader>
-      <CardContent className={cn("flex-1 p-4 overflow-auto relative flex items-center justify-center transition-colors", isDark ? 'bg-gray-900' : 'bg-muted/30')}>
+      <CardContent className={cn("flex-1 p-4 overflow-auto relative flex items-center justify-center transition-colors", isDark ? 'bg-[#1a1a1a]' : 'bg-muted/30')}>
         <div ref={viewerRef} className="w-full h-full [&>svg]:max-w-full [&>svg]:h-auto" />
         {error && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-destructive/10 p-4 text-center">
