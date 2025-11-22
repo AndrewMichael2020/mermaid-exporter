@@ -4,7 +4,7 @@ import React, { createContext, useState, ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { 
   GoogleAuthProvider,
-  signInWithPopup, // Reverted to signInWithPopup
+  signInWithPopup,
   onAuthStateChanged,
   User as FirebaseUser
 } from "firebase/auth";
@@ -48,9 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Only log session start if not already logged
         logUserActivity(uid, 'session_start', { email });
         
-        if (window.location.pathname === '/') {
-             router.push("/viz");
-        }
+        // No need to redirect to /viz anymore as we are on the root page
       } else {
         setUser(null);
         localStorage.removeItem("mermaid-user-session");
@@ -64,7 +62,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      // Reverted to Popup as requested
       await signInWithPopup(auth, provider);
     } catch (error) {
       console.error("Error signing in with Google", error);
@@ -78,7 +75,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logUserActivity(user.uid, 'session_end');
       }
       await auth.signOut();
-      router.push("/");
+      // Just reload or stay on page, no need to redirect to / as we are already there
+      router.refresh(); 
     } catch (error) {
       console.error("Error signing out", error);
     }
