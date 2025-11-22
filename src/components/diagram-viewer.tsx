@@ -24,20 +24,20 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
   const viewerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
-  const { theme: appTheme } = useNextTheme();
+  const { resolvedTheme } = useNextTheme();
 
   useEffect(() => {
     const renderDiagram = async () => {
       try {
         const mermaid = await mermaidPromise;
         
-        let effectiveTheme = theme;
-        if (theme === 'dark' && appTheme !== 'dark') {
-          effectiveTheme = 'default';
-        } else if (theme !== 'dark' && appTheme === 'dark') {
-          effectiveTheme = 'dark';
+        let effectiveTheme: MermaidConfig["theme"] = 'default';
+        if (resolvedTheme === 'dark') {
+            effectiveTheme = 'dark';
         }
-        
+        if (theme !== 'default' && theme !== 'dark') {
+            effectiveTheme = theme as MermaidConfig["theme"];
+        }
 
         mermaid.initialize({
           startOnLoad: false,
@@ -79,7 +79,7 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
     };
 
     renderDiagram();
-  }, [code, theme, appTheme]);
+  }, [code, theme, resolvedTheme]);
   
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
