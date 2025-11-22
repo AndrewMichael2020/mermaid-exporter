@@ -76,7 +76,8 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
 
   const handleDownload = () => {
     if (viewerRef.current?.firstElementChild) {
-        const svgBlob = new Blob([viewerRef.current.innerHTML], { type: 'image/svg+xml;charset=utf-8' });
+        const svgContent = viewerRef.current.innerHTML.replace(/<br>/g, '<br/>');
+        const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
         const svgUrl = URL.createObjectURL(svgBlob);
         const downloadLink = document.createElement('a');
         downloadLink.href = svgUrl;
