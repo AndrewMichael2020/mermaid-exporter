@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Download, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme as useNextTheme } from "next-themes";
+
 
 // Dynamically import mermaid to avoid SSR issues
 const mermaidPromise = import("mermaid").then((m) => m.default);
@@ -22,14 +24,24 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
   const viewerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { theme: appTheme } = useNextTheme();
 
   useEffect(() => {
     const renderDiagram = async () => {
       try {
         const mermaid = await mermaidPromise;
+        
+        let effectiveTheme = theme;
+        if (theme === 'dark' && appTheme !== 'dark') {
+          effectiveTheme = 'default';
+        } else if (theme !== 'dark' && appTheme === 'dark') {
+          effectiveTheme = 'dark';
+        }
+        
+
         mermaid.initialize({
           startOnLoad: false,
-          theme: theme,
+          theme: effectiveTheme,
           securityLevel: 'loose',
           fontFamily: 'Inter, sans-serif'
         } as MermaidConfig);
@@ -67,7 +79,7 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
     };
 
     renderDiagram();
-  }, [code, theme]);
+  }, [code, theme, appTheme]);
   
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
