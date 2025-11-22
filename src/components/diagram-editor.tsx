@@ -80,7 +80,7 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
               aria-label="Mermaid code editor"
             />
           </TabsContent>
-          <TabsContent value="generate" className="flex-1 flex flex-col p-4">
+          <TabsContent value="generate" className="flex-1 flex flex-col p-4 gap-4">
             <Textarea
               placeholder="Describe the diagram you want to create... e.g., 'a flowchart with a start node, a decision node, and two end nodes'"
               value={generateDescription}
@@ -88,12 +88,12 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
               className="flex-1 w-full resize-y"
               aria-label="Diagram generation description"
             />
-            <Button onClick={handleGenerate} disabled={isGenerating} className="w-full shrink-0 mt-4">
+            <Button onClick={handleGenerate} disabled={isGenerating} className="w-full shrink-0">
               {isGenerating ? <RotateCw className="mr-2 h-4 w-4 animate-spin" /> : <BrainCircuit className="mr-2 h-4 w-4" />}
               {isGenerating ? 'Generating...' : 'Generate with AI'}
             </Button>
           </TabsContent>
-          <TabsContent value="enhance" className="flex-1 flex flex-col p-4">
+          <TabsContent value="enhance" className="flex-1 flex flex-col p-4 gap-4">
             <Textarea
               placeholder="Describe how you want to enhance the current diagram... e.g., 'add a new step after the decision node' or 'change the color of the start node to red'"
               value={enhancePrompt}
@@ -101,7 +101,7 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
               className="flex-1 w-full resize-y"
               aria-label="Diagram enhancement prompt"
             />
-            <Button onClick={handleEnhance} disabled={isEnhancing} className="w-full shrink-0 mt-4">
+            <Button onClick={handleEnhance} disabled={isEnhancing} className="w-full shrink-0">
               {isEnhancing ? <RotateCw className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
               {isEnhancing ? 'Enhancing...' : 'Enhance with AI'}
             </Button>
