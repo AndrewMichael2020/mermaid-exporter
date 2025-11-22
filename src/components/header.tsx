@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useAuth } from "@/hooks/use-auth";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { useAuth } from '@/hooks/use-auth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +10,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { LogIn, LogOut } from "lucide-react";
-import type { User } from "@/contexts/auth";
-import Image from "next/image";
+} from '@/components/ui/dropdown-menu';
+import { LogIn, LogOut } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Header() {
   const { user, signIn, signOut } = useAuth();
@@ -32,9 +31,9 @@ export default function Header() {
                 <AvatarImage src={user.image} alt={user.name} data-ai-hint="person portrait" />
                 <AvatarFallback>
                   {user.name
-                    .split(" ")
+                    .split(' ')
                     .map((n) => n[0])
-                    .join("")}
+                    .join('')}
                 </AvatarFallback>
               </Avatar>
             </Button>

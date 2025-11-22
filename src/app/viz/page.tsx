@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/use-auth";
-import Header from "@/components/header";
-import DiagramEditor from "@/components/diagram-editor";
-import DiagramViewer from "@/components/diagram-viewer";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
+import Header from '@/components/header';
+import DiagramEditor from '@/components/diagram-editor';
+import DiagramViewer from '@/components/diagram-viewer';
 
 const defaultDiagram = `graph TD
     A[Start] --> B{Is it?};
@@ -18,7 +18,7 @@ export default function VizPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [diagramCode, setDiagramCode] = useState(defaultDiagram);
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState('light');
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function VizPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/");
+      router.push('/');
     }
   }, [user, loading, router]);
 
@@ -41,7 +41,11 @@ export default function VizPage() {
 
   return (
     <div className="flex h-screen flex-col bg-background">
-      <Header />
+      <Header 
+        onGeneratedCode={setDiagramCode} 
+        onEnhancedCode={setDiagramCode} 
+        currentCode={diagramCode} 
+      />
       <main className="flex flex-1 flex-col lg:flex-row gap-4 overflow-hidden p-4">
         <div className="flex flex-1 flex-col lg:w-1/3 min-h-0">
           <DiagramEditor

@@ -116,7 +116,7 @@ export default function DiagramEditor({ code, onCodeChange }: DiagramEditorProps
               onChange={(e) => setGenerateDescription(e.target.value)}
               className="w-full resize-y"
               aria-label="Diagram generation description"
-              rows={5}
+              rows={25}
             />
             <Button
               onClick={handleGenerate}
@@ -138,7 +138,7 @@ export default function DiagramEditor({ code, onCodeChange }: DiagramEditorProps
               onChange={(e) => setEnhancePrompt(e.target.value)}
               className="w-full resize-y"
               aria-label="Diagram enhancement prompt"
-              rows={5}
+              rows={25}
             />
             <Button
               onClick={handleEnhance}

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useAuth } from "@/hooks/use-auth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Code } from "lucide-react";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useAuth } from '@/hooks/use-auth';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Code } from 'lucide-react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg role="img" viewBox="0 0 24 24" {...props}>
@@ -22,7 +22,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      router.push("/viz");
+      router.push('/viz');
     }
   }, [user, loading, router]);
 
@@ -51,9 +51,6 @@ export default function LoginPage() {
             <GoogleIcon className="mr-2 h-5 w-5" />
             Sign In with Google
           </Button>
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            (This is a demo. No real authentication is performed.)
-          </p>
         </CardContent>
       </Card>
     </main>

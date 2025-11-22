@@ -2,12 +2,18 @@
 
 import React, { createContext, useState, ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { 
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged,
+  User as FirebaseUser
+} from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 export interface User {
-  name: string;
-  email: string;
-  image: string;
+  name: string | null;
+  email: string | null;
+  image: string | null;
 }
 
 interface AuthContextType {
@@ -25,36 +31,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Simulate checking for an existing session
-    const session = localStorage.getItem("mermaid-user-session");
-    if (session) {
-      try {
-        setUser(JSON.parse(session));
-      } catch (e) {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        const { displayName, email, photoURL } = firebaseUser;
+        const userPayload: User = {
+          name: displayName,
+          email: email,
+          image: photoURL,
+        };
+        setUser(userPayload);
+        localStorage.setItem("mermaid-user-session", JSON.stringify(userPayload));
+        router.push("/viz");
+      } else {
+        setUser(null);
         localStorage.removeItem("mermaid-user-session");
       }
-    }
-    setLoading(false);
-  }, []);
+      setLoading(false);
+    });
 
-  const signIn = () => {
-    const avatar = PlaceHolderImages.find((img) => img.id === "user-avatar");
-    const dummyUser: User = {
-      name: "Alex Doe",
-      email: "alex.doe@example.com",
-      image: avatar
-        ? avatar.imageUrl
-        : "https://picsum.photos/seed/user/100/100",
-    };
-    localStorage.setItem("mermaid-user-session", JSON.stringify(dummyUser));
-    setUser(dummyUser);
-    router.push("/viz");
+    return () => unsubscribe();
+  }, [router]);
+
+  const signIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error("Error signing in with Google", error);
+    }
   };
 
-  const signOut = () => {
-    localStorage.removeItem("mermaid-user-session");
-    setUser(null);
-    router.push("/");
+  const signOut = async () => {
+    try {
+      await auth.signOut();
+      router.push("/");
+    } catch (error) {
+      console.error("Error signing out", error);
+    }
   };
 
   return (
