@@ -6,6 +6,7 @@ export interface DiagramExample {
 }
 
 export const diagramExamples: DiagramExample[] = [
+  // --- Existing ---
   {
     title: "Flowchart",
     description: "Standard process flow with decisions.",
@@ -105,21 +106,16 @@ export const diagramExamples: DiagramExample[] = [
   },
   {
     title: "Timeline",
-    description: "Chronological event visualization.",
+    description: "Chronological event visualization with sections.",
     category: "Business",
     code: `timeline
-  title Major Events
-  2000 : Y2K
-  2001 : 9/11
-  2020 : COVID-19`
-  },
-  {
-    title: "Sankey Diagram",
-    description: "Flow visualization with weighted arrows.",
-    category: "Data",
-    code: `sankey-beta
-  Source,Flow,5
-  Flow,Destination,5`
+  title AI History
+  section Early Days
+    1956 : Dartmouth Workshop
+    1965 : ELIZA
+  section Modern Era
+    2012 : AlexNet
+    2022 : GPT-3.5`
   },
   {
     title: "Git Graph",
@@ -149,5 +145,84 @@ export const diagramExamples: DiagramExample[] = [
   "Campaign B": [0.45, 0.23]
   "Campaign C": [0.57, 0.69]
   "Campaign D": [0.78, 0.34]`
+  },
+  // --- New Additions ---
+  {
+    title: "Org Chart",
+    description: "Visualize hierarchical structures like company teams.",
+    category: "Business",
+    code: `graph TD
+    subgraph Company
+        c(CEO)
+        subgraph Tech
+            cto(CTO)
+            cto --> dev1(Developer)
+            cto --> dev2(Developer)
+        end
+        subgraph HR
+            h(HR Manager)
+        end
+        c --> cto
+        c --> h
+    end`
+  },
+  {
+    title: "User Journey",
+    description: "Map out the steps and experiences of a user.",
+    category: "UX",
+    code: `journey
+    title User Onboarding
+    section Visit
+      Landing Page: 5: User
+      Signup Form: 3: User
+    section Use
+      Tutorial: 4: New User
+      First Project: 2: New User`
+  },
+  {
+    title: "Requirement Diagram",
+    description: "Model system requirements and their relationships.",
+    category: "Systems",
+    code: `requirementDiagram
+  requirement req1 {
+    id: 001
+    text: System shall handle 10k req/s
+  }
+  requirement req2 {
+    id: 002
+    text: System shall encrypt all data
+  }
+  req1 --> req2`
+  },
+  {
+    title: "Flowchart with Subgraphs",
+    description: "Organize complex flowcharts into logical groups.",
+    category: "Basic",
+    code: `graph LR
+  subgraph API
+    A[Request] --> B[Validate]
+  end
+  subgraph Worker
+    C[Process] --> D[Save]
+  end
+
+  B --> C`
+  },
+  {
+    title: "C4 Diagram",
+    description: "A lightweight model for software architecture.",
+    category: "Systems",
+    code: `C4Context
+  title System Context for Mermaid Cloud Viz
+  
+  Person(user, "User")
+  System(cloudViz, "Mermaid Cloud Viz", "Generates and enhances diagrams using AI.")
+  
+  System_Ext(genkit, "Google Genkit", "AI Framework")
+  System_Ext(google, "Google AI", "Language Models")
+  
+  user -> cloudViz: Uses
+  cloudViz -> genkit: Calls
+  genkit -> google: Accesses Models`
   }
 ];
