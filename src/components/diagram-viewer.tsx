@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme as useNextTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
 
 // Dynamically import mermaid to avoid SSR issues
@@ -25,6 +26,8 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { resolvedTheme } = useNextTheme();
+
+  const isDarkTheme = theme === 'dark' || theme === 'forest' || (theme === 'default' && resolvedTheme === 'dark');
 
   useEffect(() => {
     const renderDiagram = async () => {
@@ -132,7 +135,7 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
             </Button>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 p-4 overflow-auto relative flex items-center justify-center bg-muted/30">
+      <CardContent className={cn("flex-1 p-4 overflow-auto relative flex items-center justify-center", isDarkTheme ? 'bg-gray-800' : 'bg-muted/30')}>
         <div ref={viewerRef} className="w-full h-full [&>svg]:max-w-full [&>svg]:h-auto" />
         {error && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-destructive/10 p-4 text-center">
