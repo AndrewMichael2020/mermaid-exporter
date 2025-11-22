@@ -33,7 +33,11 @@ const prompt = ai.definePrompt({
 
   You will generate Mermaid code based on the user's description. Ensure the generated code is valid Mermaid code.
   
-  IMPORTANT: Do not add any 'classDef', 'linkStyle', or other styling commands. The styling is handled by a theme selector.
+  IMPORTANT GUIDELINES:
+  1. Do not add any 'classDef', 'linkStyle', or other styling commands. The styling is handled by a theme selector.
+  2. If a node label contains special characters (like parentheses, brackets, or quotes), you MUST wrap the label in double quotes.
+     Example: A["Node with (parentheses)"] --> B["Another Node"]
+  3. Ensure all brackets are properly closed.
 
   Description: {{{description}}}`,
 });
