@@ -4,7 +4,7 @@ import React, { createContext, useState, ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { 
   GoogleAuthProvider,
-  signInWithRedirect, // Changed from signInWithPopup
+  signInWithPopup, // Reverted to signInWithPopup
   onAuthStateChanged,
   User as FirebaseUser
 } from "firebase/auth";
@@ -45,8 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(userPayload);
         localStorage.setItem("mermaid-user-session", JSON.stringify(userPayload));
         
-        // Only log session start if not already logged (simple check)
-        // Ideally we check if it's a new session, but logging on every state init is okay for now
+        // Only log session start if not already logged
         logUserActivity(uid, 'session_start', { email });
         
         if (window.location.pathname === '/') {
@@ -65,8 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      // Using Redirect instead of Popup to avoid COOP/COEP and popup blocker issues
-      await signInWithRedirect(auth, provider);
+      // Reverted to Popup as requested
+      await signInWithPopup(auth, provider);
     } catch (error) {
       console.error("Error signing in with Google", error);
       logUserActivity(undefined, 'error_sign_in', { error: String(error) });
