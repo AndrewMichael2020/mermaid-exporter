@@ -62,7 +62,7 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
 
   return (
     <Card className="flex flex-col h-full shadow-lg">
-      <CardContent className="p-0 flex-1 flex flex-col">
+      <CardContent className="p-0 flex flex-col flex-1">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
           <div className="p-4 border-b">
             <TabsList className="grid w-full grid-cols-3">
@@ -76,7 +76,7 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
               placeholder="Paste your Mermaid code here..."
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="flex-1 font-mono text-sm"
+              className="h-full font-mono text-sm resize-y"
               aria-label="Mermaid code editor"
             />
           </TabsContent>
@@ -85,7 +85,7 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
               placeholder="Describe the diagram you want to create... e.g., 'a flowchart with a start node, a decision node, and two end nodes'"
               value={generateDescription}
               onChange={(e) => setGenerateDescription(e.target.value)}
-              className="flex-1"
+              className="h-full resize-y"
               aria-label="Diagram generation description"
             />
             <Button onClick={handleGenerate} disabled={isGenerating} className="shrink-0">
@@ -98,7 +98,7 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
               placeholder="Describe how you want to enhance the current diagram... e.g., 'add a new step after the decision node' or 'change the color of the start node to red'"
               value={enhancePrompt}
               onChange={(e) => setEnhancePrompt(e.target.value)}
-              className="flex-1"
+              className="h-full resize-y"
               aria-label="Diagram enhancement prompt"
             />
             <Button onClick={handleEnhance} disabled={isEnhancing} className="shrink-0">
