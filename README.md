@@ -70,7 +70,7 @@ This application requires two services to be running concurrently: the Next.js f
     npm run dev
     ```
 
-Your application should now be running at [http://localhost:9003](http://localhost:9003).
+Your application should now be running at [http://localhost:9005](http://localhost:9005).
 
 ## 🤝 Contributing
 

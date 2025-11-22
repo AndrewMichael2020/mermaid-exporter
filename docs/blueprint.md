@@ -17,3 +17,22 @@
 - Use clean, minimalist icons for diagram elements and actions.
 - Employ a clean, intuitive layout to make the app easy to use.
 - Implement smooth transitions and subtle animations to enhance user experience.
+
+## UI Architecture Decisions
+
+### Diagram Editor Layout
+We encountered significant challenges with the layout of the `DiagramEditor` component, specifically regarding input alignment and resizability.
+- **Problem**: Using a deeply nested `Card` -> `Tabs` -> `TabsContent` structure from shadcn/ui caused issues where:
+    1. The text inputs in "Generate" and "Enhance" tabs were vertically centered or pushed down due to flexbox behavior (`flex-1` growing behavior on containers).
+    2. The "Code" tab editor was difficult to make resizable because `flex-1` forced it to a calculated height, overriding user resizing interactions.
+    3. An "invisible grid" or unwanted spacing appeared due to default margins and flex alignment in the library components.
+
+- **Solution**: We refactored the `DiagramEditor` to decouple the layout from the `Tabs` component logic.
+    1. **Navigation Only**: The `Tabs` component is now used *only* for the header navigation (tab switching). It does not wrap the content.
+    2. **Direct Rendering**: Content panels are rendered directly as standard `div` elements based on the `activeTab` state.
+    3. **Explicit Control**:
+        - **Code Tab**: Uses `min-h-full` to ensure it fills the available space but allows expansion.
+        - **Generate/Enhance Tabs**: Uses a simple flex column with `justify-start` to force inputs to the absolute top, eliminating unwanted vertical centering or gaps.
+    4. **Parent Container**: The parent column in `src/app/viz/page.tsx` uses `overflow-y-auto` to allow the editor to grow beyond the viewport height if the user resizes the input, preventing content clipping.
+
+This "manual layout" approach provides superior control and predictability compared to relying on the default styles of the component library wrappers for complex, full-height editor interfaces.
