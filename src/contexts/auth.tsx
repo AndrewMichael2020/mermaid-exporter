@@ -4,7 +4,7 @@ import React, { createContext, useState, ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { 
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect, // Changed from signInWithPopup
   onAuthStateChanged,
   User as FirebaseUser
 } from "firebase/auth";
@@ -44,11 +44,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
         setUser(userPayload);
         localStorage.setItem("mermaid-user-session", JSON.stringify(userPayload));
-        // Only log session start if we just authenticated (could add better session tracking later)
-        // For now, let's log it here.
+        
+        // Only log session start if not already logged (simple check)
+        // Ideally we check if it's a new session, but logging on every state init is okay for now
         logUserActivity(uid, 'session_start', { email });
         
-        // Only push to viz if we are on the home page (basic check to avoid redirect loops or overriding explicit nav)
         if (window.location.pathname === '/') {
              router.push("/viz");
         }
@@ -65,8 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      // The onAuthStateChanged will handle the state update and logging
+      // Using Redirect instead of Popup to avoid COOP/COEP and popup blocker issues
+      await signInWithRedirect(auth, provider);
     } catch (error) {
       console.error("Error signing in with Google", error);
       logUserActivity(undefined, 'error_sign_in', { error: String(error) });
