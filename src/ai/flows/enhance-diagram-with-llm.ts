@@ -34,7 +34,9 @@ const enhanceDiagramWithLLMPrompt = ai.definePrompt({
 
   The user will provide you with a Mermaid diagram code and a prompt describing desired enhancements.
   Your task is to enhance the diagram code based on the prompt.
-  
+
+  When the user asks to "add 'X' under 'Y'", you should interpret this as a hierarchical relationship. Create a new node for 'X' and draw a one-way arrow from 'Y' to 'X' (e.g., Y --> X). Do not create loops or bidirectional arrows unless specifically asked.
+
   IMPORTANT: Do not add any 'classDef', 'linkStyle', or other styling commands. The styling is handled by a theme selector.
   You will be penalized if you add any styling.
 
