@@ -9,7 +9,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {googleAI} from '@genkit-ai/google-genai';
 
 const EnhanceDiagramWithLLMInputSchema = z.object({
   diagramCode: z.string().describe('The Mermaid diagram code to enhance.'),

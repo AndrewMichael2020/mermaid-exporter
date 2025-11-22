@@ -9,7 +9,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {googleAI} from '@genkit-ai/google-genai';
 
 const GenerateDiagramInputSchema = z.object({
   description: z.string().describe('A natural language description of the diagram.'),
