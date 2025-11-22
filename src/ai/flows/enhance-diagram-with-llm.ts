@@ -35,15 +35,12 @@ const enhanceDiagramWithLLMPrompt = ai.definePrompt({
   Your task is to enhance the diagram code based on the prompt.
 
   Original Diagram Code:
-  ```mermaid
+  '''mermaid
   {{{diagramCode}}}
-  ```
+  '''
 
-  Enhancement Prompt: {{{enhancementPrompt}}}
-
-  Enhanced Diagram Code:
-  ```mermaid
-  `, // Note the prompt will continue from here in the flow
+  Please provide the full, enhanced Mermaid diagram code below.
+  `,
 });
 
 const enhanceDiagramWithLLMFlow = ai.defineFlow(
@@ -54,8 +51,17 @@ const enhanceDiagramWithLLMFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await enhanceDiagramWithLLMPrompt(input);
+    
+    let enhancedCode = output!.enhancedDiagramCode;
+    // The model sometimes wraps the code in ```mermaid ... ```, so we should strip that.
+    const codeBlockRegex = /'''(?:mermaid)?\s*([\s\S]*?)\s*'''/;
+    const match = codeBlockRegex.exec(enhancedCode);
+    if (match) {
+      enhancedCode = match[1].trim();
+    }
+
     return {
-      enhancedDiagramCode: output!.enhancedDiagramCode, // The prompt ends with the ``` so it looks like code.
+      enhancedDiagramCode: enhancedCode,
     };
   }
 );
