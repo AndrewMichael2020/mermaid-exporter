@@ -6,7 +6,6 @@ import { useAuth } from "@/hooks/use-auth";
 import Header from "@/components/header";
 import DiagramEditor from "@/components/diagram-editor";
 import DiagramViewer from "@/components/diagram-viewer";
-import { useToast } from "@/hooks/use-toast";
 
 const defaultDiagram = `graph TD
     A[Start] --> B{Is it?};
@@ -18,7 +17,6 @@ const defaultDiagram = `graph TD
 export default function VizPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const { toast } = useToast();
   const [diagramCode, setDiagramCode] = useState(defaultDiagram);
   const [theme, setTheme] = useState("light");
   const [isMounted, setIsMounted] = useState(false);
@@ -48,8 +46,7 @@ export default function VizPage() {
         <div className="flex flex-1 flex-col lg:w-1/3 min-h-0">
           <DiagramEditor
             code={diagramCode}
-            setCode={setDiagramCode}
-            toast={toast}
+            onCodeChange={setDiagramCode}
           />
         </div>
         <div className="flex flex-1 flex-col lg:w-2/3 min-h-0">
