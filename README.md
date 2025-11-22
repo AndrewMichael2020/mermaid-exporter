@@ -1,6 +1,12 @@
 # Mermaid Cloud Viz
 
+![Project Logo](public/logo.png)
+
 An AI-powered application to visualize, create, and enhance [Mermaid.js](https://mermaid-js.github.io/mermaid/) diagrams. This project uses Next.js for the frontend and Google's Genkit for AI-powered features.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Genkit](https://img.shields.io/badge/Genkit-2391ff?style=for-the-badge&logo=firebase&logoColor=white)](https://firebase.google.com/docs/genkit)
 
 ## ✨ Features
 
@@ -11,29 +17,37 @@ An AI-powered application to visualize, create, and enhance [Mermaid.js](https:/
 *   **Light & Dark Modes**: Switch between light and dark themes for your comfort.
 *   **SVG Export**: Download your diagrams as high-quality SVG files.
 
-## 🛠️ Tech Stack
+## 🛠️ Built With
 
-*   **Framework**: [Next.js](https://nextjs.org/) (with App Router)
-*   **AI**: [Google Genkit](https://firebase.google.com/docs/genkit)
-*   **UI**: [React](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/), [shadcn/ui](https://ui.shadcn.com/)
-*   **Diagramming**: [Mermaid.js](https://mermaid-js.github.io/mermaid/)
-*   **Language**: [TypeScript](https://www.typescriptlang.org/)
+*   [Next.js](https://nextjs.org/) - The React framework for the web.
+*   [Google Genkit](https://firebase.google.com/docs/genkit) - The AI framework for building generative AI applications.
+*   [React](https://react.dev/) - A JavaScript library for building user interfaces.
+*   [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework for rapid UI development.
+*   [shadcn/ui](https://ui.shadcn.com/) - A collection of re-usable components built using Radix UI and Tailwind CSS.
+*   [Mermaid.js](https://mermaid-js.github.io/mermaid/) - A JavaScript based diagramming and charting tool.
+*   [TypeScript](https://www.typescriptlang.org/) - A typed superset of JavaScript that compiles to plain JavaScript.
 
 ## 🚀 Getting Started
 
-Follow these instructions to get a local copy up and running.
+To get a local copy up and running, follow these simple steps.
 
 ### Prerequisites
 
-*   Node.js (v18 or later recommended)
-*   npm or yarn
+Make sure you have Node.js (v18 or later) and npm installed on your machine.
+
+*   **npm**
+    ```sh
+    npm install npm@latest -g
+    ```
 
 ### Installation
 
-1.  Clone the repository.
-2.  Navigate to the project directory.
-3.  Install the dependencies:
-    ```bash
+1.  Clone the repo
+    ```sh
+    git clone https://github.com/AndrewMichael2020/mermaid-exporter.git
+    ```
+2.  Install NPM packages
+    ```sh
     npm install
     ```
 
@@ -55,17 +69,20 @@ This application requires two services to be running concurrently: the Next.js f
 
 Your application should now be running at [http://localhost:9003](http://localhost:9003).
 
-### Other Commands
+## 🤝 Contributing
 
-*   **Build for production**:
-    ```bash
-    npm run build
-    ```
-*   **Start production server**:
-    ```bash
-    npm run start
-    ```
-*   **Lint the code**:
-    ```bash
-    npm run lint
-    ```
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+
+Don't forget to give the project a star! Thanks again!
+
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
+
+## 📜 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
