@@ -31,12 +31,11 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
       try {
         const mermaid = await mermaidPromise;
         
-        let effectiveTheme: MermaidConfig["theme"] = 'default';
-        if (resolvedTheme === 'dark') {
-            effectiveTheme = 'dark';
-        }
-        if (theme !== 'default' && theme !== 'dark') {
-            effectiveTheme = theme as MermaidConfig["theme"];
+        let effectiveTheme: MermaidConfig["theme"];
+        if (theme === 'default') {
+          effectiveTheme = resolvedTheme === 'dark' ? 'dark' : 'default';
+        } else {
+          effectiveTheme = theme as MermaidConfig["theme"];
         }
 
         mermaid.initialize({
@@ -44,7 +43,7 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
           theme: effectiveTheme,
           securityLevel: 'loose',
           fontFamily: 'Inter, sans-serif'
-        } as MermaidConfig);
+        });
 
         if (viewerRef.current && code) {
           // Check syntax before rendering
