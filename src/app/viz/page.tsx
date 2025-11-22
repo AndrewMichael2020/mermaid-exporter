@@ -20,7 +20,7 @@ export default function VizPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [diagramCode, setDiagramCode] = useState(defaultDiagram);
-  const [theme, setTheme] = useState("default");
+  const [theme, setTheme] = useState("light");
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {

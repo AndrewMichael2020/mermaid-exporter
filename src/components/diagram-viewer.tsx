@@ -11,7 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useTheme as useNextTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
-
 // Dynamically import mermaid to avoid SSR issues
 const mermaidPromise = import("mermaid").then((m) => m.default);
 
@@ -21,14 +20,25 @@ interface DiagramViewerProps {
   setTheme: (theme: string) => void;
 }
 
-export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerProps) {
+const darkThemeVariables = {
+    background: '#1a1a1a',
+    primaryColor: '#2e2e2e',
+    primaryTextColor: '#f0f0f0',
+    lineColor: '#888888',
+    textColor: '#f0f0f0',
+    nodeBorder: '#888888',
+    mainBkg: '#333333',
+    nodeTextColor: '#f0f0f0',
+};
+
+
+export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: DiagramViewerProps) {
   const viewerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { resolvedTheme } = useNextTheme();
 
-  // Determine the effective theme for Mermaid and the background
-  const effectiveTheme = theme === 'dark' || (theme === 'default' && resolvedTheme === 'dark') ? 'dark' : 'default';
+  const effectiveTheme = selectedTheme === 'dark' || (selectedTheme === 'default' && resolvedTheme === 'dark') ? 'dark' : 'light';
   const isDark = effectiveTheme === 'dark';
 
   useEffect(() => {
@@ -36,15 +46,20 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
       try {
         const mermaid = await mermaidPromise;
         
-        mermaid.initialize({
+        const config: MermaidConfig = {
           startOnLoad: false,
-          theme: effectiveTheme,
+          theme: isDark ? 'dark' : 'default',
           securityLevel: 'loose',
-          fontFamily: 'Inter, sans-serif'
-        });
+          fontFamily: 'Inter, sans-serif',
+        };
+
+        if (isDark) {
+            config.themeVariables = darkThemeVariables;
+        }
+
+        mermaid.initialize(config);
 
         if (viewerRef.current && code) {
-          // Check syntax before rendering
           try {
             await mermaid.parse(code);
             setError(null);
@@ -76,43 +91,36 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
     };
 
     renderDiagram();
-  }, [code, theme, resolvedTheme, effectiveTheme]);
+  }, [code, selectedTheme, resolvedTheme, isDark]);
   
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
     toast({ title: 'Copied to clipboard!', description: 'Mermaid code has been copied.' });
   }
 
-  const handleDownload = () => {
-    if (viewerRef.current?.firstElementChild) {
-        let svgContent = viewerRef.current.innerHTML.replace(/<br>/g, '<br/>');
+  const handleDownload = async () => {
+    if (!viewerRef.current?.firstElementChild || error) {
+      toast({ title: 'Download failed', description: error ? 'Cannot download a diagram with errors.' : 'There is no diagram to download.', variant: 'destructive'});
+      return;
+    }
 
+    try {
+        const mermaid = await mermaidPromise;
+        const config: MermaidConfig = {
+            startOnLoad: false,
+            theme: isDark ? 'dark' : 'default',
+            securityLevel: 'loose',
+            fontFamily: 'Inter, sans-serif',
+        };
         if (isDark) {
-          const style = `<style>
-            svg {
-                background-color: #24292e;
-                color: white;
-            }
-            .node rect, .node circle, .node polygon, .node ellipse {
-                fill: #333;
-                stroke: #888;
-            }
-            .node text, text {
-                fill: #f0f0f0;
-            }
-            .edgePaths path {
-                stroke: #888;
-            }
-            .edgeLabels text {
-                fill: #f0f0f0;
-            }
-            .cluster rect {
-                fill: #222;
-                stroke: #888;
-            }
-        </style>`;
-          svgContent = svgContent.replace(/<svg/, `<svg>${style}`);
+            config.themeVariables = darkThemeVariables;
         }
+        mermaid.initialize(config);
+
+        const { svg } = await mermaid.render("mermaid-download-svg-" + Date.now(), code);
+        
+        // Sanitize <br> tags to be XML-compliant
+        const svgContent = svg.replace(/<br>/g, '<br/>');
 
         const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
         const svgUrl = URL.createObjectURL(svgBlob);
@@ -124,10 +132,10 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
         document.body.removeChild(downloadLink);
         URL.revokeObjectURL(svgUrl);
         toast({ title: 'Downloading diagram.svg' });
-    } else if (error) {
-        toast({ title: 'Download failed', description: 'Cannot download a diagram with errors.', variant: 'destructive'});
-    } else {
-        toast({ title: 'Download failed', description: 'There is no diagram to download.', variant: 'destructive'});
+
+    } catch (e) {
+        console.error("Failed to render diagram for download", e);
+        toast({ title: 'Download failed', description: 'Could not render diagram for download.', variant: 'destructive'});
     }
   }
 
@@ -137,12 +145,12 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
         <CardTitle className="text-lg font-headline">Visualization</CardTitle>
         <div className="flex items-center gap-2">
             <Label htmlFor="theme-select" className="text-sm font-normal sr-only sm:not-sr-only">Theme</Label>
-            <Select value={theme} onValueChange={setTheme}>
+            <Select value={selectedTheme} onValueChange={setTheme}>
                 <SelectTrigger id="theme-select" className="w-[120px]">
                     <SelectValue placeholder="Theme" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="default">Light</SelectItem>
+                    <SelectItem value="light">Light</SelectItem>
                     <SelectItem value="dark">Dark</SelectItem>
                 </SelectContent>
             </Select>
@@ -156,7 +164,7 @@ export default function DiagramViewer({ code, theme, setTheme }: DiagramViewerPr
             </Button>
         </div>
       </CardHeader>
-      <CardContent className={cn("flex-1 p-4 overflow-auto relative flex items-center justify-center", isDark ? 'bg-gray-800' : 'bg-muted/30')}>
+      <CardContent className={cn("flex-1 p-4 overflow-auto relative flex items-center justify-center transition-colors", isDark ? 'bg-gray-900' : 'bg-muted/30')}>
         <div ref={viewerRef} className="w-full h-full [&>svg]:max-w-full [&>svg]:h-auto" />
         {error && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-destructive/10 p-4 text-center">
