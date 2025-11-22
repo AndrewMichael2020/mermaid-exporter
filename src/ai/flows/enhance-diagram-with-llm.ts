@@ -30,7 +30,6 @@ const enhanceDiagramWithLLMPrompt = ai.definePrompt({
   name: 'enhanceDiagramWithLLMPrompt',
   input: {schema: EnhanceDiagramWithLLMInputSchema},
   output: {schema: EnhanceDiagramWithLLMOutputSchema},
-  model: googleAI.model('gemini-1.5-flash-latest'),
   prompt: `You are an expert in Mermaid diagrams.
 
   The user will provide you with a Mermaid diagram code and a prompt describing desired enhancements.
