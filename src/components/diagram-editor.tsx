@@ -72,39 +72,45 @@ export default function DiagramEditor({ code, setCode, toast }: DiagramEditorPro
             </TabsList>
           </div>
           <TabsContent value="code" className="flex-1 flex flex-col m-0 p-4 space-y-4">
-            <Textarea
-              placeholder="Paste your Mermaid code here..."
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              className="flex-1 font-mono text-sm resize-y"
-              aria-label="Mermaid code editor"
-            />
+            <div className="flex flex-col flex-1 space-y-4">
+                <Textarea
+                  placeholder="Paste your Mermaid code here..."
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  className="flex-1 font-mono text-sm resize-y"
+                  aria-label="Mermaid code editor"
+                />
+            </div>
           </TabsContent>
           <TabsContent value="generate" className="flex-1 flex flex-col m-0 p-4 space-y-4">
-            <Textarea
-              placeholder="Describe the diagram you want to create... e.g., 'a flowchart with a start node, a decision node, and two end nodes'"
-              value={generateDescription}
-              onChange={(e) => setGenerateDescription(e.target.value)}
-              className="flex-1 resize-y"
-              aria-label="Diagram generation description"
-            />
-            <Button onClick={handleGenerate} disabled={isGenerating} className="shrink-0">
-              {isGenerating ? <RotateCw className="mr-2 h-4 w-4 animate-spin" /> : <BrainCircuit className="mr-2 h-4 w-4" />}
-              {isGenerating ? "Generating..." : "Generate with AI"}
-            </Button>
+             <div className="flex flex-col flex-1 space-y-4 h-full">
+                <Textarea
+                    placeholder="Describe the diagram you want to create... e.g., 'a flowchart with a start node, a decision node, and two end nodes'"
+                    value={generateDescription}
+                    onChange={(e) => setGenerateDescription(e.target.value)}
+                    className="flex-1 resize-y"
+                    aria-label="Diagram generation description"
+                />
+                <Button onClick={handleGenerate} disabled={isGenerating} className="shrink-0">
+                  {isGenerating ? <RotateCw className="mr-2 h-4 w-4 animate-spin" /> : <BrainCircuit className="mr-2 h-4 w-4" />}
+                  {isGenerating ? "Generating..." : "Generate with AI"}
+                </Button>
+            </div>
           </TabsContent>
           <TabsContent value="enhance" className="flex-1 flex flex-col m-0 p-4 space-y-4">
-            <Textarea
-              placeholder="Describe how you want to enhance the current diagram... e.g., 'add a new step after the decision node' or 'change the color of the start node to red'"
-              value={enhancePrompt}
-              onChange={(e) => setEnhancePrompt(e.target.value)}
-              className="flex-1 resize-y"
-              aria-label="Diagram enhancement prompt"
-            />
-            <Button onClick={handleEnhance} disabled={isEnhancing} className="shrink-0">
-              {isEnhancing ? <RotateCw className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-              {isEnhancing ? "Enhancing..." : "Enhance with AI"}
-            </Button>
+            <div className="flex flex-col flex-1 space-y-4 h-full">
+                <Textarea
+                  placeholder="Describe how you want to enhance the current diagram... e.g., 'add a new step after the decision node' or 'change the color of the start node to red'"
+                  value={enhancePrompt}
+                  onChange={(e) => setEnhancePrompt(e.target.value)}
+                  className="flex-1 resize-y"
+                  aria-label="Diagram enhancement prompt"
+                />
+                <Button onClick={handleEnhance} disabled={isEnhancing} className="shrink-0">
+                  {isEnhancing ? <RotateCw className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+                  {isEnhancing ? "Enhancing..." : "Enhance with AI"}
+                </Button>
+            </div>
           </TabsContent>
         </Tabs>
       </CardContent>
