@@ -6,223 +6,158 @@ export interface DiagramExample {
 }
 
 export const diagramExamples: DiagramExample[] = [
-  // --- Existing ---
   {
-    title: "Flowchart",
-    description: "Standard process flow with decisions.",
-    category: "Basic",
+    title: "Patient Triage Flowchart",
+    description: "Visualizes the patient assessment and routing process in an emergency department.",
+    category: "Clinical Workflow",
     code: `graph TD
-  A[Start] --> B{Decision?}
-  B -- Yes --> C[Action OK]
-  B -- No --> D[Action FAIL]
-  C --> E[End]
-  D --> E`
+    A[Patient Arrives] --> B{Initial Triage};
+    B -- Critical --> C[Resuscitation Bay];
+    B -- Urgent --> D[Main Treatment Area];
+    B -- Non-Urgent --> E[Waiting Room];
+    E --> F[Re-assessment];
+    F --> D;
+    C --> G[Admit to ICU];
+    D --> H{Discharge or Admit?};
+    H -- Discharge --> I[Discharge Lounge];
+    H -- Admit --> J[Admit to Ward];`
   },
   {
-    title: "Sequence Diagram",
-    description: "Interaction between participants over time.",
-    category: "UML",
+    title: "EHR Data Request",
+    description: "Sequence of events for a clinic requesting patient records from a central lab.",
+    category: "Health Informatics",
     code: `sequenceDiagram
-  participant Alice
-  participant Bob
-  Alice->>Bob: Hello Bob
-  Bob-->>Alice: Hi Alice`
+  participant Clinic as Primary Care Clinic
+  participant EHR as Electronic Health Record API
+  participant Lab as Pathology Lab System
+
+  Clinic->>EHR: Request lab results for Patient X
+  activate EHR
+  EHR->>Lab: Query for Patient X records
+  activate Lab
+  Lab-->>EHR: Return results
+  deactivate Lab
+  EHR-->>Clinic: Display lab results
+  deactivate EHR`
   },
   {
-    title: "Class Diagram",
-    description: "Structure of a system showing classes and relationships.",
-    category: "UML",
-    code: `classDiagram
-  class Person {
-    +String name
-    +int age
-    +walk()
-  }
-  class Student {
-    +int studentId
-    +int marks
-    +study()
-  }
-  Person <|-- Student`
-  },
-  {
-    title: "State Diagram",
-    description: "Finite state machine visualization.",
-    category: "UML",
-    code: `stateDiagram-v2
-  [*] --> Idle
-  Idle --> Running : start
-  Running --> Paused : pause
-  Paused --> Running : resume
-  Paused --> [*] : stop`
-  },
-  {
-    title: "Gantt Chart",
-    description: "Project schedule and timeline.",
-    category: "Business",
-    code: `gantt
-  title Project Timeline
-  dateFormat  YYYY-MM-DD
-  section Phase 1
-    Task A       :a1, 2023-01-01, 10d
-    Task B       :after a1, 7d
-  section Phase 2
-    Milestone    :milestone, 2023-01-25, 0d`
-  },
-  {
-    title: "Pie Chart",
-    description: "Simple distribution visualization.",
-    category: "Business",
-    code: `pie
-  title Browser Usage
-  "Chrome"  : 60
-  "Firefox" : 25
-  "Edge"    : 15`
-  },
-  {
-    title: "ER Diagram",
-    description: "Entity Relationship diagram for database modeling.",
-    category: "Database",
-    code: `erDiagram
-  CUSTOMER ||--o{ ORDER : places
-  ORDER ||--|{ LINE_ITEM : contains
-  CUSTOMER {
-    string name
-    string address
-  }`
-  },
-  {
-    title: "Mindmap",
-    description: "Hierarchical mind map for brainstorming.",
-    category: "Creative",
-    code: `mindmap
-  root((Life))
-    Origins
-      Earth
-      Mars
-    Journey
-      Climb
-      Ski`
-  },
-  {
-    title: "Timeline",
-    description: "Chronological event visualization with sections.",
-    category: "Business",
-    code: `timeline
-  title AI History
-  section Early Days
-    1956 : Dartmouth Workshop
-    1965 : ELIZA
-  section Modern Era
-    2012 : AlexNet
-    2022 : GPT-3.5`
-  },
-  {
-    title: "Git Graph",
-    description: "Visualization of git commits and branches.",
-    category: "Developer",
-    code: `gitGraph
-  commit
-  branch develop
-  commit
-  checkout main
-  merge develop
-  commit`
-  },
-  {
-    title: "Quadrant Chart",
-    description: "XY matrix for prioritizing items.",
-    category: "Business",
-    code: `quadrantChart
-  title Risk vs Reward
-  x-axis Low Risk --> High Risk
-  y-axis Low Reward --> High Reward
-  quadrant-1 We should expand
-  quadrant-2 Need to promote
-  quadrant-3 Re-evaluate
-  quadrant-4 May be improved
-  "Campaign A": [0.3, 0.6]
-  "Campaign B": [0.45, 0.23]
-  "Campaign C": [0.57, 0.69]
-  "Campaign D": [0.78, 0.34]`
-  },
-  // --- New Additions ---
-  {
-    title: "Org Chart",
-    description: "Visualize hierarchical structures like company teams.",
-    category: "Business",
+    title: "Hospital Org Chart",
+    description: "Shows the hierarchical structure of a hospital's leadership.",
+    category: "Administration",
     code: `graph TD
-    subgraph Company
-        c(CEO)
-        subgraph Tech
-            cto(CTO)
-            cto --> dev1(Developer)
-            cto --> dev2(Developer)
+    subgraph Hospital Leadership
+        A(CEO)
+        subgraph Medical Staff
+            B(Chief Medical Officer)
+            B --> D(Head of Surgery)
+            B --> E(Head of Medicine)
         end
-        subgraph HR
-            h(HR Manager)
+        subgraph Operations
+            C(Chief Operating Officer)
+            C --> F(Director of Nursing)
+            C --> G(Facilities Manager)
         end
-        c --> cto
-        c --> h
+        A --> B
+        A --> C
     end`
   },
   {
-    title: "User Journey",
-    description: "Map out the steps and experiences of a user.",
-    category: "UX",
+    title: "Patient State Diagram",
+    description: "Tracks the status of a patient from admission to discharge.",
+    category: "Clinical Workflow",
+    code: `stateDiagram-v2
+  [*] --> Admitted
+  Admitted --> In_Surgery: Undergoes Procedure
+  In_Surgery --> Post_Op_Care: Recovers
+  Post_Op_Care --> Discharged: Medically Cleared
+  Discharged --> [*]`
+  },
+  {
+    title: "Clinical Trial Timeline",
+    description: "A Gantt chart outlining the phases of a new drug trial.",
+    category: "Research",
+    code: `gantt
+  title Drug XYZ Clinical Trial
+  dateFormat  YYYY-MM-DD
+  section Phase 1
+    Recruitment :a1, 2024-01-01, 30d
+    Initial Dosing :after a1, 60d
+  section Phase 2
+    Efficacy Study :2024-04-01, 120d
+  section Data Analysis
+    Final Analysis :2024-08-01, 45d
+    FDA Submission :after Final Analysis, 15d`
+  },
+  {
+    title: "ER Diagram: Patient Records",
+    description: "A simple database schema for patients, doctors, and appointments.",
+    category: "Health Informatics",
+    code: `erDiagram
+  PATIENT ||--o{ APPOINTMENT : "schedules"
+  DOCTOR ||--o{ APPOINTMENT : "attends"
+  PATIENT {
+    int patient_id PK
+    string name
+    date date_of_birth
+  }
+  DOCTOR {
+    int doctor_id PK
+    string name
+    string specialty
+  }
+  APPOINTMENT {
+    int appointment_id PK
+    datetime time
+    string reason
+  }`
+  },
+  {
+    title: "Public Health Campaign Mindmap",
+    description: "Brainstorming key areas for a community flu shot campaign.",
+    category: "Epidemiology",
+    code: `mindmap
+  root((Flu Shot Campaign))
+    Outreach
+      Social Media
+      Community Clinics
+      Flyers & Posters
+    Logistics
+      Vaccine Supply
+      Staffing
+      Locations
+    Target Groups
+      Seniors (65+)
+      Healthcare Workers
+      Schools`
+  },
+  {
+    title: "Outbreak Investigation Timeline",
+    description: "Chronological events during an epidemiological investigation.",
+    category: "Epidemiology",
+    code: `timeline
+  title Norovirus Outbreak Investigation
+  2024-01-10 : First case reported
+  2024-01-11 : Public Health unit notified
+  2024-01-12 : Epidemiological interviews begin
+             : Lab samples collected
+  2024-01-14 : Source identified (Restaurant A)
+  2024-01-15 : Public announcement`
+  },
+  {
+    title: "Patient Journey Map",
+    description: "Mapping the patient experience from booking to follow-up.",
+    category: "Patient Experience",
     code: `journey
-    title User Onboarding
+    title Primary Care Visit for Chronic Condition
+    section Booking
+      Finds clinic online: 5: Patient
+      Books appointment via phone: 4: Patient
     section Visit
-      Landing Page: 5: User
-      Signup Form: 3: User
-    section Use
-      Tutorial: 4: New User
-      First Project: 2: New User`
-  },
-  {
-    title: "Requirement Diagram",
-    description: "Model system requirements and their relationships.",
-    category: "Systems",
-    code: `requirementDiagram
-  requirement req1 {
-    id: 001
-    text: System shall handle 10k req/s
-  }
-  requirement req2 {
-    id: 002
-    text: System shall encrypt all data
-  }
-  req1 --> req2`
-  },
-  {
-    title: "Flowchart with Subgraphs",
-    description: "Organize complex flowcharts into logical groups.",
-    category: "Basic",
-    code: `graph LR
-  subgraph API
-    A[Request] --> B[Validate]
-  end
-  subgraph Worker
-    C[Process] --> D[Save]
-  end
-
-  B --> C`
-  },
-  {
-    title: "C4 Diagram",
-    description: "A lightweight model for software architecture.",
-    category: "Systems",
-    code: `C4Context
-  title System Context for Mermaid Cloud Viz
-  
-  Person(user, "User")
-  System(cloudViz, "Mermaid Cloud Viz", "Generates and enhances diagrams using AI.")
-  
-  System_Ext(genkit, "Google Genkit", "AI Framework")
-  System_Ext(google, "Google AI", "Language Models")
-  
-  user -> cloudViz: Uses
-  cloudViz -> genkit: Calls
-  genkit -> google: Accesses Models`
+      Check-in: 3: Patient
+      Consultation with GP: 5: Patient
+      Receives prescription: 5: Patient
+    section Follow-up
+      Books follow-up test: 4: Patient
+      Receives results via portal: 5: Patient`
   }
 ];
