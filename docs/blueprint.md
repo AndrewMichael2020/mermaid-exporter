@@ -7,6 +7,7 @@
 - Visualization Options: Offer several built-in diagram themes/styles for enhanced visualization. Implement functionality for the LLM to act as a 'tool', incorporating information regarding diagram parameters (i.e. parameters a user can specify) to enhance the rendered diagram based on user needs.
 - Google Authentication: Secure the application behind Google Authentication to control access.
 - Cloud Run Deployment: Deploy the Next.js application to Cloud Run in the specified project (agents-mcp-training).
+- **Diagram Gallery**: An extensive gallery of pre-built, audience-specific diagrams (e.g., healthcare) to provide inspiration and starting templates for users.
 
 ## Style Guidelines:
 

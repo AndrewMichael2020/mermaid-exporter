@@ -8,12 +8,15 @@ import DiagramEditor from '@/components/diagram-editor';
 import DiagramViewer from '@/components/diagram-viewer';
 import { logUserActivity } from '@/lib/logging';
 
-const defaultDiagram = `graph TD
-    A[Start] --> B{Is it?};
-    B -- Yes --> C[OK];
-    C --> D[End];
-    B -- No --> E[Find out];
-    E --> B;`;
+// Showcase a relevant, audience-specific diagram by default
+const defaultDiagram = `timeline
+  title Norovirus Outbreak Investigation
+  2024-01-10 : First case reported
+  2024-01-11 : Public Health unit notified
+  2024-01-12 : Epidemiological interviews begin
+             : Lab samples collected
+  2024-01-14 : Source identified (Restaurant A)
+  2024-01-15 : Public announcement`;
 
 export default function HomePage() {
   const { user, loading } = useAuth();
@@ -48,11 +51,7 @@ export default function HomePage() {
 
   return (
     <div className="flex h-screen flex-col bg-background">
-      <Header 
-        onGeneratedCode={setDiagramCode} 
-        onEnhancedCode={setDiagramCode} 
-        currentCode={diagramCode} 
-      />
+      <Header />
       <main className="flex flex-1 flex-col lg:flex-row gap-4 p-4 overflow-hidden">
         <div className="flex flex-col lg:w-1/3 min-h-0 h-full overflow-y-auto">
           <DiagramEditor
