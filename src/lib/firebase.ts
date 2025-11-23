@@ -14,14 +14,19 @@ const firebaseConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-// Initialize Analytics (only on client side)
+// Initialize Firebase only in the browser to avoid running client SDKs during
+// server-side build/prerender (which can fail if NEXT_PUBLIC_* values are
+// missing or invalid at build time).
+let app: any = null;
+let auth: any = null;
+let db: any = null;
 let analytics: any = null;
+
 if (typeof window !== "undefined") {
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
+  db = getFirestore(app);
+
   isSupported().then((supported) => {
     if (supported) {
       analytics = getAnalytics(app);
