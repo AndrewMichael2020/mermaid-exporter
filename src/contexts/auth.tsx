@@ -33,36 +33,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser) {
-        const { uid, displayName, email, photoURL } = firebaseUser;
-        const userPayload: User = {
-          uid: uid,
-          name: displayName,
-          email: email,
-          image: photoURL,
-        };
-        setUser(userPayload);
-        localStorage.setItem("mermaid-user-session", JSON.stringify(userPayload));
-        
-        // Only log session start if not already logged
-        logUserActivity(uid, 'session_start', { email });
-        
-        // No need to redirect to /viz anymore as we are on the root page
-      } else {
-        setUser(null);
-        localStorage.removeItem("mermaid-user-session");
-      }
-      setLoading(false);
-    });
+    if (auth) {
+      const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+        if (firebaseUser) {
+          const { uid, displayName, email, photoURL } = firebaseUser;
+          const userPayload: User = {
+            uid: uid,
+            name: displayName,
+            email: email,
+            image: photoURL,
+          };
+          setUser(userPayload);
+          localStorage.setItem("mermaid-user-session", JSON.stringify(userPayload));
+          
+          // Only log session start if not already logged
+          logUserActivity(uid, 'session_start', { email });
+          
+          // No need to redirect to /viz anymore as we are on the root page
+        } else {
+          setUser(null);
+          localStorage.removeItem("mermaid-user-session");
+        }
+        setLoading(false);
+      });
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    } else {
+      setLoading(false);
+    }
   }, [router]);
 
   const signIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      if (auth) {
+        await signInWithPopup(auth, provider);
+      }
     } catch (error) {
       console.error("Error signing in with Google", error);
       logUserActivity(undefined, 'error_sign_in', { error: String(error) });
@@ -74,7 +80,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (user?.uid) {
         logUserActivity(user.uid, 'session_end');
       }
-      await auth.signOut();
+      if (auth) {
+        await auth.signOut();
+      }
       // Just reload or stay on page, no need to redirect to / as we are already there
       router.refresh(); 
     } catch (error) {
