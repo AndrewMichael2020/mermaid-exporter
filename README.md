@@ -2,7 +2,7 @@
 
 An AI-powered application to visualize, create, and enhance [Mermaid.js](https://mermaid-js.github.io/mermaid/) diagrams. This project uses Next.js for the frontend and Google's Genkit for AI-powered features.
 
-![Mermaid Cloud Viz Screenshot](public/screenshots/gallery-screenshot.png)
+![Mermaid Cloud Viz Screenshot](docs/gallery-1.png)
 
 ## ✨ Core Features
 
