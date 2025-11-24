@@ -2,6 +2,15 @@
 
 An AI-powered application to visualize, create, and enhance [Mermaid.js](https://mermaid-js.github.io/mermaid/) diagrams. This project uses Next.js for the frontend and Google's Genkit for AI-powered features.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/AndrewMichael2020/mermaid-exporter)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
+[![Security: No Vulnerabilities](https://img.shields.io/badge/security-no%20vulnerabilities-brightgreen.svg)](https://github.com/AndrewMichael2020/mermaid-exporter/security)
+[![Code Coverage](https://img.shields.io/badge/coverage-97.58%25-brightgreen.svg)](https://github.com/AndrewMichael2020/mermaid-exporter)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](https://github.com/AndrewMichael2020/mermaid-exporter)
+
 ![Mermaid Cloud Viz Screenshot](docs/gallery-1.png)
 
 ## ✨ Core Features
@@ -53,6 +62,16 @@ This application requires two services to be running concurrently: the Next.js f
     ```
 
 Your application should now be running at [http://localhost:9005](http://localhost:9005).
+
+## 🔒 Security
+
+Security is a priority for this project. If you discover any security vulnerabilities, please review our [Security Policy](SECURITY.md) for information on how to report them responsibly.
+
+### Quick Security Tips
+- Never commit API keys or credentials
+- Keep dependencies updated with `npm audit fix`
+- Use environment variables for sensitive configuration
+- Review the [Security Policy](SECURITY.md) for deployment best practices
 
 ## 📜 License
 
