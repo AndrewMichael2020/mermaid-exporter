@@ -1,4 +1,17 @@
 # Mermaid Cloud Viz
+<!-- Badges: CI / Deploy / License / Issues -->
+[![Build & Deploy](https://github.com/AndrewMichael2020/mermaid-exporter/actions/workflows/deploy-cloudrun.yml/badge.svg)](https://github.com/AndrewMichael2020/mermaid-exporter/actions/workflows/deploy-cloudrun.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![Issues](https://img.shields.io/github/issues/AndrewMichael2020/mermaid-exporter.svg)](https://github.com/AndrewMichael2020/mermaid-exporter/issues)
+
+<!-- Additional badges: Code Scanning, Dependabot, Coverage, Tests, Release -->
+[![CodeQL](https://github.com/AndrewMichael2020/mermaid-exporter/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/AndrewMichael2020/mermaid-exporter/actions/workflows/codeql-analysis.yml)
+[![Dependabot Status](https://img.shields.io/badge/dependabot-enabled-brightgreen.svg)](https://github.com/AndrewMichael2020/mermaid-exporter/security/dependabot)
+[![Codecov](https://codecov.io/gh/AndrewMichael2020/mermaid-exporter/branch/main/graph/badge.svg)](https://codecov.io/gh/AndrewMichael2020/mermaid-exporter)
+[![Tests](https://github.com/AndrewMichael2020/mermaid-exporter/actions/workflows/test.yml/badge.svg)](https://github.com/AndrewMichael2020/mermaid-exporter/actions/workflows/test.yml)
+[![Release](https://img.shields.io/github/v/release/AndrewMichael2020/mermaid-exporter.svg)](https://github.com/AndrewMichael2020/mermaid-exporter/releases)
+
+> Note: Some badges require the corresponding GitHub Actions workflows or integrations to be enabled (CodeQL, Tests, Codecov, Dependabot). Inactive badges will update automatically once those workflows run or the integration is configured.
 
 An AI-powered application to visualize, create, and enhance [Mermaid.js](https://mermaid-js.github.io/mermaid/) diagrams. This project uses Next.js for the frontend and Google's Genkit for AI-powered features.
 
