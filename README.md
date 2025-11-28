@@ -1,6 +1,6 @@
 # Mermaid Cloud Viz
 <!-- Badges: CI / Deploy / License / Issues -->
-[![Build & Deploy](https://github.com/AndrewMichael2020/mermaid-exporter/actions/workflows/deploy-cloudrun.yml/badge.svg)](https://github.com/AndrewMichael2020/mermaid-exporter/actions/workflows/deploy-cloudrun.yml)
+[![Build & Deploy](https://github.com/AndrewMichael2020/mermaid-exporter/actions/workflows/main.yml/badge.svg)](https://github.com/AndrewMichael2020/mermaid-exporter/actions/workflows/main.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Issues](https://img.shields.io/github/issues/AndrewMichael2020/mermaid-exporter.svg)](https://github.com/AndrewMichael2020/mermaid-exporter/issues)
 
