@@ -1,3 +1,114 @@
+**Usage: Reusable Workflows**
+
+This repository provides two production-ready reusable GitHub Actions workflows to use from other repositories:
+
+- **`reusable-ci.yml`** — runs lint, TypeScript type checks and tests.
+- **`reusable-deploy-cloudrun.yml`** — builds a container with Cloud Build and deploys it to Google Cloud Run.
+
+**Quick Overview**
+- **Caller responsibility:** A repository that calls `reusable-deploy-cloudrun.yml` must provide the `GCP_SA_KEY` secret (service account key JSON) and ensure the required runtime/config secrets exist in the target GCP project's Secret Manager.
+- **Where secrets live:** The deploy workflow verifies secrets exist in Google Secret Manager in the target project; it expects the secret names listed under `secrets-to-check`.
+
+**Example: call the reusable deploy workflow**
+```yaml
+name: Remote Deploy
+on: workflow_dispatch: {}
+jobs:
+  call-deploy:
+    uses: AndrewMichael2020/mermaid-exporter/.github/workflows/reusable-deploy-cloudrun.yml@main
+    with:
+      project: YOUR_GCP_PROJECT_ID
+      service: YOUR_CLOUD_RUN_SERVICE
+      region: us-central1
+      image-tag: ${{ github.sha }}
+      secrets-to-check: |
+        NEXT_PUBLIC_FIREBASE_API_KEY
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID
+        NEXT_PUBLIC_FIREBASE_APP_ID
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+        GEMINI_API_KEY
+    secrets:
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+```
+
+**Required secrets and how they are used**
+- **Repository secret:** `GCP_SA_KEY` — raw service account JSON (or base64-encoded JSON) used by the workflow to authenticate `gcloud`.
+- **GCP Secret Manager (in the target project):** the deploy workflow checks presence of the runtime secrets listed in `secrets-to-check`. Typical defaults in this repo are the Firebase client keys and `GEMINI_API_KEY`.
+
+**Provisioning & secrets — recommended quick steps**
+- Create a service account for GitHub Actions and grant required roles (allow the SA to deploy Cloud Run, use Cloud Build, and access Secret Manager). Example roles: `roles/run.admin`, `roles/iam.serviceAccountUser`, `roles/cloudbuild.builds.editor`, `roles/secretmanager.secretAccessor`, `roles/storage.admin`.
+
+Create SA and key (example):
+```bash
+PROJECT=your-gcp-project-id
+SA_NAME=github-actions-deployer
+SA_EMAIL="${SA_NAME}@${PROJECT}.iam.gserviceaccount.com"
+
+# create SA
+gcloud iam service-accounts create "$SA_NAME" --project="$PROJECT" --display-name="GitHub Actions Deployer"
+
+# grant roles (adjust to least privilege you need)
+gcloud projects add-iam-policy-binding "$PROJECT" --member="serviceAccount:${SA_EMAIL}" --role="roles/run.admin"
+gcloud projects add-iam-policy-binding "$PROJECT" --member="serviceAccount:${SA_EMAIL}" --role="roles/iam.serviceAccountUser"
+gcloud projects add-iam-policy-binding "$PROJECT" --member="serviceAccount:${SA_EMAIL}" --role="roles/cloudbuild.builds.editor"
+gcloud projects add-iam-policy-binding "$PROJECT" --member="serviceAccount:${SA_EMAIL}" --role="roles/secretmanager.secretAccessor"
+gcloud projects add-iam-policy-binding "$PROJECT" --member="serviceAccount:${SA_EMAIL}" --role="roles/storage.admin"
+
+# create key
+gcloud iam service-accounts keys create /tmp/sa.json --iam-account="$SA_EMAIL" --project="$PROJECT"
+
+# Upload raw JSON into GitHub repo secret
+gh secret set GCP_SA_KEY --repo "OWNER/REPO" --body "$(cat /tmp/sa.json)"
+rm -f /tmp/sa.json
+```
+
+**Upload runtime secrets into GCP Secret Manager (from `.env.local`)**
+- This repo includes `scripts/upload-secrets.sh` which reads a local `.env.local` and creates/updates the secrets in Secret Manager and grants access to your backend.
+
+Usage (example):
+```bash
+# Set PROJECT or pass --project
+./scripts/upload-secrets.sh --project your-gcp-project-id --env-file .env.local
+```
+
+Notes:
+- The script will skip placeholder values and will not print secret contents.
+- After upload the deploy workflow should find secrets in Secret Manager and proceed.
+
+**Triggering the reusable deploy workflow**
+- From caller repo you can:
+  - Use the GitHub UI: Actions → pick the workflow → Run workflow.
+  - Use `gh`: `gh workflow run main.yml --repo "OWNER/REPO" --ref main` (requires token with `workflow` scope or an account with repo admin).
+  - Push to the branch configured to trigger the caller workflow (e.g., `main`) — the repo caller's event must match the `on:` of the caller workflow.
+
+**Common errors and how to fix them**
+- `Service account key is neither valid JSON nor valid base64-encoded JSON.` — re-create the `GCP_SA_KEY` repo secret with either the raw JSON or a single-line base64-encoded JSON. Example to upload raw JSON: `gh secret set GCP_SA_KEY --repo OWNER/REPO --body "$(cat /tmp/sa.json)"`.
+- `Missing secrets in Secret Manager:` — ensure the listed secret names exist in the target project. Use `gcloud secrets list --project=YOUR_PROJECT` and `gcloud secrets versions access latest --secret=NAME --project=YOUR_PROJECT` to verify.
+- `403: Resource not accessible by integration` when using `gh workflow run` — the token used must have the `workflow` scope or be a user token with repo permissions; use the GitHub UI or a PAT with `workflow` scope.
+
+**Verifying a deployment**
+- Get the Cloud Run service URL:
+  ```bash
+  gcloud run services describe SERVICE_NAME --project=PROJECT --region=REGION --platform=managed --format='value(status.url)'
+  ```
+- View Cloud Build logs in Cloud Console or via `gcloud builds list` and `gcloud builds describe BUILD_ID`.
+- Inspect GitHub Actions logs in the Actions UI or via `gh run view <run-id> --repo OWNER/REPO --log`.
+
+**Security & cleanup**
+- Remove any local copies of service account keys after uploading: `rm -f /tmp/sa.json`.
+- Rotate and revoke keys regularly. To delete a key: `gcloud iam service-accounts keys delete KEY_ID --iam-account="$SA_EMAIL"`.
+- After deployment reduce IAM privileges to least-privilege necessary.
+
+If you'd like, I can:
+- run `./scripts/upload-secrets.sh --project <PROJECT> --env-file .env.local` here (you already ran it successfully),
+- recreate or rotate the `GCP_SA_KEY` and upload it, or
+- trigger the deploy workflow and stream logs for you.
+
+---
+
+File location: `.github/workflows/reusable-deploy-cloudrun.yml` and `scripts/upload-secrets.sh` contain the canonical deploy logic and helper scripts; follow this `USAGE.md` for a smooth workflow.
 Usage: Reusable Workflows
 
 This repository exposes two reusable workflows in `.github/workflows/`:
@@ -23,7 +134,7 @@ jobs:
 ```
 
 Example caller that invokes the reusable deploy workflow:
-
+ 
 ```yaml
 name: Remote Deploy
 on:
