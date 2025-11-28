@@ -1,12 +1,26 @@
-name: Build and Deploy to Cloud Run (caller)
+name: Main CI & Deploy
 
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch: {}
 
 jobs:
-  call-reusable-deploy:
+  ci:
+    name: CI (call reusable)
+    uses: ./.github/workflows/reusable-ci.yml
+    with:
+      node-version: '20'
+      run-lint: true
+      run-typecheck: true
+      run-tests: true
+
+  deploy:
+    name: Deploy to Cloud Run (call reusable)
+    # Run deploy only on pushes to main or when manually dispatched
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
     uses: ./.github/workflows/reusable-deploy-cloudrun.yml
     with:
       project: ${{ secrets.GCP_PROJECT }}
