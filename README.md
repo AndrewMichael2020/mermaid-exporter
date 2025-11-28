@@ -58,6 +58,10 @@ Your application should now be running at [http://localhost:9005](http://localho
 
 This repository includes a GitHub Actions workflow in `.github/workflows/deploy-cloudrun.yml` that builds a container using Cloud Build and deploys it to Cloud Run.
 
+**For comprehensive deployment instructions, see [docs/deployment.md](docs/deployment.md).**
+
+### Quick Start
+
 Prerequisites:
 - A GCP project with Cloud Run enabled
 - A GCP service account key with the roles: `Cloud Run Admin`, `Cloud Build Editor`, `Service Account User`, and `Secret Manager Secret Accessor`
@@ -69,10 +73,21 @@ Steps:
 3. Configure the GitHub Actions secrets listed above in your repository settings
 4. Push to `main` – the workflow will build the image and deploy it to Cloud Run using the secrets mapped at runtime via `--update-secrets`.
 
+### Local Deployment with Cloud Build
+
+You can also deploy directly using Cloud Build:
+
+```sh
+gcloud builds submit --config=cloudbuild.yaml \
+  --substitutions=_SERVICE_NAME=mermaid-exporter,_REGION=us-central1
+```
+
+### Uploading Secrets
+
 If you want to upload your local `.env.local` values directly to Secret Manager, you can run the helper script (ensure you have the Google Cloud SDK configured and the right permissions):
 
 ```sh
-./scripts/upload-secrets.sh <GCP_PROJECT> .env.local
+./scripts/upload-secrets.sh --project <GCP_PROJECT> --env-file .env.local
 ```
 
 Notes:

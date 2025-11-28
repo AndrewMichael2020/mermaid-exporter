@@ -5,19 +5,31 @@ on:
     branches: [ main ]
   workflow_dispatch: {}
 
+env:
+  # Default region - can be overridden by secrets
+  DEFAULT_REGION: us-central1
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
-        with:
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          project_id: ${{ secrets.GCP_PROJECT }}
 
       - name: Configure Docker auth for GCR
         run: gcloud auth configure-docker --quiet
@@ -27,8 +39,8 @@ jobs:
           PROJECT: ${{ secrets.GCP_PROJECT }}
           REGION: ${{ secrets.CLOUD_RUN_REGION }}
         run: |
-          gcloud config set project $PROJECT
-          gcloud config set run/region $REGION
+          gcloud config set project "$PROJECT"
+          gcloud config set run/region "${REGION:-$DEFAULT_REGION}"
 
       - name: Verify required secrets exist in Secret Manager
         env:
@@ -44,10 +56,19 @@ jobs:
             "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"
             "GEMINI_API_KEY"
           )
+          missing_secrets=()
           for s in "${secrets[@]}"; do
             echo "Checking $s..."
-            gcloud secrets describe "$s" --project "$PROJECT" >/dev/null || { echo "Secret $s not found in project $PROJECT"; exit 1; }
+            if ! gcloud secrets describe "$s" --project "$PROJECT" >/dev/null 2>&1; then
+              missing_secrets+=("$s")
+            fi
           done
+          if [ ${#missing_secrets[@]} -gt 0 ]; then
+            echo "::error::Missing secrets in Secret Manager: ${missing_secrets[*]}"
+            echo "Please create them using: gcloud secrets create <SECRET_NAME> --project=$PROJECT"
+            exit 1
+          fi
+          echo "All required secrets verified."
 
       - name: Build and push image (Cloud Build)
         env:
@@ -55,9 +76,13 @@ jobs:
           SERVICE: ${{ secrets.CLOUD_RUN_SERVICE }}
         run: |
           set -euo pipefail
-          IMAGE=gcr.io/${PROJECT}/${SERVICE}:${GITHUB_SHA::7}
+          IMAGE="gcr.io/${PROJECT}/${SERVICE}:${GITHUB_SHA::7}"
+          IMAGE_LATEST="gcr.io/${PROJECT}/${SERVICE}:latest"
           echo "Building $IMAGE"
-          gcloud builds submit --tag "$IMAGE"
+          gcloud builds submit \
+            --tag "$IMAGE" \
+            --tag "$IMAGE_LATEST" \
+            --timeout=1200s
 
       - name: Deploy to Cloud Run
         env:
@@ -66,27 +91,64 @@ jobs:
           REGION: ${{ secrets.CLOUD_RUN_REGION }}
         run: |
           set -euo pipefail
-          IMAGE=gcr.io/${PROJECT}/${SERVICE}:${GITHUB_SHA::7}
-          echo "Deploying $SERVICE to Cloud Run ($REGION)"
+          IMAGE="gcr.io/${PROJECT}/${SERVICE}:${GITHUB_SHA::7}"
+          DEPLOY_REGION="${REGION:-$DEFAULT_REGION}"
+          echo "Deploying $SERVICE to Cloud Run ($DEPLOY_REGION)"
           gcloud run deploy "$SERVICE" \
             --image "$IMAGE" \
-            --region "$REGION" \
+            --region "$DEPLOY_REGION" \
             --platform managed \
             --allow-unauthenticated \
-            --update-secrets NEXT_PUBLIC_FIREBASE_API_KEY=projects/${PROJECT}/secrets/NEXT_PUBLIC_FIREBASE_API_KEY:latest \
-            --update-secrets NEXT_PUBLIC_FIREBASE_PROJECT_ID=projects/${PROJECT}/secrets/NEXT_PUBLIC_FIREBASE_PROJECT_ID:latest \
-            --update-secrets NEXT_PUBLIC_FIREBASE_APP_ID=projects/${PROJECT}/secrets/NEXT_PUBLIC_FIREBASE_APP_ID:latest \
-            --update-secrets NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=projects/${PROJECT}/secrets/NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:latest \
-            --update-secrets NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=projects/${PROJECT}/secrets/NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET:latest \
-            --update-secrets NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=projects/${PROJECT}/secrets/NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID:latest \
-            --update-secrets GEMINI_API_KEY=projects/${PROJECT}/secrets/GEMINI_API_KEY:latest
+            --port 8080 \
+            --memory 512Mi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 10 \
+            --update-secrets "NEXT_PUBLIC_FIREBASE_API_KEY=NEXT_PUBLIC_FIREBASE_API_KEY:latest" \
+            --update-secrets "NEXT_PUBLIC_FIREBASE_PROJECT_ID=NEXT_PUBLIC_FIREBASE_PROJECT_ID:latest" \
+            --update-secrets "NEXT_PUBLIC_FIREBASE_APP_ID=NEXT_PUBLIC_FIREBASE_APP_ID:latest" \
+            --update-secrets "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:latest" \
+            --update-secrets "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET:latest" \
+            --update-secrets "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID:latest" \
+            --update-secrets "GEMINI_API_KEY=GEMINI_API_KEY:latest"
 
-      - name: Output Cloud Run Service URL
+      - name: Get Cloud Run Service URL
+        id: service_url
         env:
           PROJECT: ${{ secrets.GCP_PROJECT }}
           SERVICE: ${{ secrets.CLOUD_RUN_SERVICE }}
           REGION: ${{ secrets.CLOUD_RUN_REGION }}
         run: |
           set -euo pipefail
-          url=$(gcloud run services describe $SERVICE --platform managed --region $REGION --format='value(status.url)')
+          DEPLOY_REGION="${REGION:-$DEFAULT_REGION}"
+          url=$(gcloud run services describe "$SERVICE" \
+            --platform managed \
+            --region "$DEPLOY_REGION" \
+            --format='value(status.url)')
           echo "Cloud Run Service URL: $url"
+          echo "service_url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Health check
+        env:
+          SERVICE_URL: ${{ steps.service_url.outputs.service_url }}
+        run: |
+          set -euo pipefail
+          echo "Performing health check on $SERVICE_URL..."
+          max_attempts=5
+          attempt=1
+          while [ $attempt -le $max_attempts ]; do
+            echo "Attempt $attempt of $max_attempts..."
+            status_code=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL" --max-time 30 || echo "000")
+            if [ "$status_code" = "200" ]; then
+              echo "✅ Health check passed! Service is healthy."
+              exit 0
+            fi
+            echo "Received status code: $status_code"
+            if [ $attempt -lt $max_attempts ]; then
+              echo "Waiting 10 seconds before next attempt..."
+              sleep 10
+            fi
+            attempt=$((attempt + 1))
+          done
+          echo "::warning::Health check did not return 200 after $max_attempts attempts (last status: $status_code)"
+          echo "Service may still be starting up. Please verify manually at: $SERVICE_URL"
