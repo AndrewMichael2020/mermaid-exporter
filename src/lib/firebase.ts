@@ -33,6 +33,8 @@ export async function initClientFirebase() {
       authDomain: cfg.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
       storageBucket: cfg.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
       messagingSenderId: cfg.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      // measurementId is optional (used for Analytics)
+      measurementId: cfg.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
     };
 
     _app = initializeApp(firebaseConfig);
