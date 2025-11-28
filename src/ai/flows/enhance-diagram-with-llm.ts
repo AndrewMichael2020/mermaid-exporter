@@ -65,7 +65,6 @@ const enhanceDiagramWithLLMFlow = ai.defineFlow(
     } catch (err) {
       // Log full error server-side for diagnosis and return a safe message to callers
       // so production builds don't leak sensitive details in the client error.
-      // eslint-disable-next-line no-console
       console.error('LLM request failed in enhanceDiagramWithLLMFlow:', err);
       throw new Error('Diagram enhancement failed: upstream language model error.');
     }

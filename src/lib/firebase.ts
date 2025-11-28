@@ -54,7 +54,6 @@ export async function initClientFirebase() {
           _analytics = getAnalytics(_app);
         }
       }).catch((err) => {
-        // eslint-disable-next-line no-console
         console.warn('Analytics not supported or failed to initialize:', err);
       });
     }
