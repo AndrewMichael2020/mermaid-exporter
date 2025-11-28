@@ -156,26 +156,26 @@ jobs:
           else
             echo "All runtime secrets resolved."
           fi
-      - name: Build and push image (Cloud Build)
+      - name: Configure Docker for GCR
+        run: |
+          set -euo pipefail
+          gcloud auth configure-docker --quiet
+      - name: Build and push image (Docker)
         id: build_image
         run: |
           set -euo pipefail
           TAG="${GITHUB_SHA:0:7}"
           IMAGE_TAG="gcr.io/${PROJECT}/${SERVICE}:${TAG}"
           IMAGE_LATEST="gcr.io/${PROJECT}/${SERVICE}:latest"
-          echo "Submitting build: $IMAGE_TAG"
-          BUILD_ID=$(gcloud builds submit --tag "$IMAGE_TAG" --tag "$IMAGE_LATEST" --format='get(id)')
-          echo "Build ID: $BUILD_ID"
-          for i in $(seq 1 12); do
-            DIGEST=$(gcloud container images list-tags "gcr.io/${PROJECT}/${SERVICE}" --filter="tags:${TAG}" --format='get(digest)' --limit=1 2>/dev/null || true)
-            [ -n "$DIGEST" ] && break
-            sleep 10
-          done
-          if [ -z "${DIGEST:-}" ]; then
-            echo "::error::Digest not found."
-            exit 1
-          fi
+          echo "Building image: $IMAGE_TAG"
+          docker build -t "$IMAGE_TAG" -t "$IMAGE_LATEST" .
+          echo "Pushing images to GCR..."
+          docker push "$IMAGE_TAG"
+          docker push "$IMAGE_LATEST"
+          echo "Getting image digest..."
+          DIGEST=$(gcloud container images describe "$IMAGE_TAG" --format='get(image_summary.digest)')
           echo "IMAGE_DIGEST=gcr.io/${PROJECT}/${SERVICE}@${DIGEST}" >> "$GITHUB_OUTPUT"
+          echo "Successfully pushed: $IMAGE_TAG"
       - name: Deploy to Cloud Run
         run: |
           set -euo pipefail
