@@ -105,6 +105,19 @@ jobs:
           echo "Environment variables containing 'GOOGLE' or 'CLOUD':"
           env | grep -iE 'google|cloud' || true
 
+      - name: Force-activate service account (explicit)
+        run: |
+          set -euo pipefail
+          if [ -n "${GOOGLE_APPLICATION_CREDENTIALS:-}" ] && [ -f "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
+            echo "Activating service account using key file..."
+            gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --project="$PROJECT" || {
+              echo "gcloud auth activate-service-account failed; dumping credentials file head:"; head -c 200 "$GOOGLE_APPLICATION_CREDENTIALS" || true; exit 1;
+            }
+            echo "After activate, gcloud auth list:"; gcloud auth list || true
+          else
+            echo "No credentials file to activate: $GOOGLE_APPLICATION_CREDENTIALS"; exit 1
+          fi
+
       - name: Verify gcloud authentication (debug)
         run: |
           set -euo pipefail
