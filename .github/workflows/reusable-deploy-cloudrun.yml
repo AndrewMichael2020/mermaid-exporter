@@ -43,14 +43,41 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
-        id: auth
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
+
+      - name: Prepare service account key and authenticate
+        env:
+          SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          PROJECT: ${{ inputs.project }}
+        run: |
+          set -euo pipefail
+          # Install jq for JSON validation
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -y && sudo apt-get install -y jq
+          fi
+          echo "Preparing service account key..."
+          # Write raw secret to a temp file
+          printf '%s' "$SA_KEY" > /tmp/sa.raw
+          # If raw is valid JSON, use it. Otherwise try base64 decode.
+          if jq -e . /tmp/sa.raw >/dev/null 2>&1; then
+            cp /tmp/sa.raw /tmp/sa.json
+          else
+            if printf '%s' "$SA_KEY" | base64 --decode > /tmp/sa.json 2>/dev/null; then
+              if jq -e . /tmp/sa.json >/dev/null 2>&1; then
+                echo "Decoded secret from base64 to JSON."
+              else
+                echo "::error::Service account key is neither valid JSON nor valid base64-encoded JSON."
+                exit 1
+              fi
+            else
+              echo "::error::Service account key is neither valid JSON nor valid base64-encoded JSON."
+              exit 1
+            fi
+          fi
+          chmod 600 /tmp/sa.json
+          # Authenticate with gcloud using the prepared key
+          gcloud auth activate-service-account --key-file=/tmp/sa.json --project="$PROJECT"
 
       - name: Configure Docker auth for GCR
         run: gcloud auth configure-docker --quiet
