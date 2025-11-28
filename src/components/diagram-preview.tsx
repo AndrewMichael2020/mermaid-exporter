@@ -26,14 +26,18 @@ export default function DiagramPreview({ code, className }: DiagramPreviewProps)
         const id = `preview-${Math.random().toString(36).substr(2, 9)}`;
         
         // Initialize with a safe config for previews
-        mermaid.initialize({
+        // Use a relaxed type for the mermaid config because some runtime options
+        // (like suppressErrorRendering) may not be present in the TS definitions
+        const previewConfig = {
           startOnLoad: false,
           theme: 'base', // Neutral theme for gallery
           securityLevel: 'loose',
           fontFamily: 'Inter, sans-serif',
           // Suppress errors in console for cleaner dev experience if syntax is experimental
-          suppressErrorRendering: true, 
-        });
+          suppressErrorRendering: true,
+        } as unknown as import('mermaid').MermaidConfig;
+
+        mermaid.initialize(previewConfig);
 
         const { svg } = await mermaid.render(id, code);
         setSvg(svg);

@@ -44,14 +44,15 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
       try {
         const mermaid = await mermaidPromise;
         
-        const config: MermaidConfig = {
+        // Cast to allow runtime-only options not present in type defs
+        const config = {
           startOnLoad: false,
           theme: isDark ? 'dark' : 'default',
           securityLevel: 'loose',
           fontFamily: 'Inter, sans-serif',
           // Suppress the default error messages to rely on our own UI
           suppressErrorRendering: true,
-        };
+        } as unknown as MermaidConfig;
 
         if (isDark) {
             config.themeVariables = darkThemeVariables;
