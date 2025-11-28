@@ -22,6 +22,33 @@ jobs:
       - name: Configure Docker auth for GCR
         run: gcloud auth configure-docker --quiet
 
+      - name: Configure gcloud defaults
+        env:
+          PROJECT: ${{ secrets.GCP_PROJECT }}
+          REGION: ${{ secrets.CLOUD_RUN_REGION }}
+        run: |
+          gcloud config set project $PROJECT
+          gcloud config set run/region $REGION
+
+      - name: Verify required secrets exist in Secret Manager
+        env:
+          PROJECT: ${{ secrets.GCP_PROJECT }}
+        run: |
+          set -euo pipefail
+          secrets=(
+            "NEXT_PUBLIC_FIREBASE_API_KEY"
+            "NEXT_PUBLIC_FIREBASE_PROJECT_ID"
+            "NEXT_PUBLIC_FIREBASE_APP_ID"
+            "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN"
+            "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"
+            "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"
+            "GEMINI_API_KEY"
+          )
+          for s in "${secrets[@]}"; do
+            echo "Checking $s..."
+            gcloud secrets describe "$s" --project "$PROJECT" >/dev/null || { echo "Secret $s not found in project $PROJECT"; exit 1; }
+          done
+
       - name: Build and push image (Cloud Build)
         env:
           PROJECT: ${{ secrets.GCP_PROJECT }}
@@ -45,6 +72,7 @@ jobs:
             --image "$IMAGE" \
             --region "$REGION" \
             --platform managed \
+            --allow-unauthenticated \
             --update-secrets NEXT_PUBLIC_FIREBASE_API_KEY=projects/${PROJECT}/secrets/NEXT_PUBLIC_FIREBASE_API_KEY:latest \
             --update-secrets NEXT_PUBLIC_FIREBASE_PROJECT_ID=projects/${PROJECT}/secrets/NEXT_PUBLIC_FIREBASE_PROJECT_ID:latest \
             --update-secrets NEXT_PUBLIC_FIREBASE_APP_ID=projects/${PROJECT}/secrets/NEXT_PUBLIC_FIREBASE_APP_ID:latest \
@@ -52,3 +80,13 @@ jobs:
             --update-secrets NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=projects/${PROJECT}/secrets/NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET:latest \
             --update-secrets NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=projects/${PROJECT}/secrets/NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID:latest \
             --update-secrets GEMINI_API_KEY=projects/${PROJECT}/secrets/GEMINI_API_KEY:latest
+
+      - name: Output Cloud Run Service URL
+        env:
+          PROJECT: ${{ secrets.GCP_PROJECT }}
+          SERVICE: ${{ secrets.CLOUD_RUN_SERVICE }}
+          REGION: ${{ secrets.CLOUD_RUN_REGION }}
+        run: |
+          set -euo pipefail
+          url=$(gcloud run services describe $SERVICE --platform managed --region $REGION --format='value(status.url)')
+          echo "Cloud Run Service URL: $url"
