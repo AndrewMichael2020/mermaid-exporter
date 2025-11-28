@@ -33,11 +33,17 @@ export default function DiagramPreview({ code, className }: DiagramPreviewProps)
           theme: 'base', // Neutral theme for gallery
           securityLevel: 'loose',
           fontFamily: 'Inter, sans-serif',
-          // Suppress errors in console for cleaner dev experience if syntax is experimental
-          suppressErrorRendering: true,
+          // Suppress Mermaid's default error rendering and let our UI handle errors
+          suppressErrors: true,
         } as unknown as import('mermaid').MermaidConfig;
 
         mermaid.initialize(previewConfig);
+        // Prevent Mermaid from injecting its own error UI
+        if (typeof mermaid.setParseErrorHandler === 'function') {
+          mermaid.setParseErrorHandler(() => {
+            // no-op: we prefer to show our own error message
+          });
+        }
 
         const { svg } = await mermaid.render(id, code);
         setSvg(svg);

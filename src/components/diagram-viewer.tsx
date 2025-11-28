@@ -51,7 +51,7 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
           securityLevel: 'loose',
           fontFamily: 'Inter, sans-serif',
           // Suppress the default error messages to rely on our own UI
-          suppressErrorRendering: true,
+          suppressErrors: true,
         } as unknown as MermaidConfig;
 
         if (isDark) {
@@ -60,12 +60,22 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
 
         mermaid.initialize(config);
 
+        // Register a parse error handler to suppress Mermaid's default error box
+        if (typeof mermaid.setParseErrorHandler === 'function') {
+          mermaid.setParseErrorHandler((err: any, hash: any) => {
+            // We prevent Mermaid from adding its own error UI; instead we surface
+            // a concise error message in our viewer's overlay (see catch below).
+            // No-op here is intentional.
+            return;
+          });
+        }
+
         if (viewerRef.current && code) {
           try {
             // The model sometimes adds classDef, which can interfere with themes.
             // We will strip it before parsing to be safe.
             const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
-            await mermaid.parse(cleanCode); // validation
+            await mermaid.parse(cleanCode, { suppressErrors: true }); // validation
             
             const { svg } = await mermaid.render(
               "mermaid-svg-" + Date.now(),
