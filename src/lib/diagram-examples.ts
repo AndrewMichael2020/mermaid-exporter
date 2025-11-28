@@ -2,14 +2,16 @@ export interface DiagramExample {
   title: string;
   description: string;
   category: string;
+  diagramType: string;
   code: string;
 }
 
 export const diagramExamples: DiagramExample[] = [
   {
-    title: "Patient Triage Flowchart",
+    title: "[Flowchart] Patient Triage Flowchart",
     description: "Visualizes the patient assessment and routing process in an emergency department.",
     category: "Clinical Workflow",
+    diagramType: "flowchart",
     code: `graph TD
     A[Patient Arrives] --> B{Initial Triage};
     B -- Critical --> C[Resuscitation Bay];
@@ -23,9 +25,10 @@ export const diagramExamples: DiagramExample[] = [
     H -- Admit --> J[Admit to Ward];`
   },
   {
-    title: "Radiology Workflow",
+    title: "[Flowchart] Radiology Workflow",
     description: "Tracks an imaging order from receipt to the final report being sent.",
     category: "Diagnostic Services",
+    diagramType: "flowchart",
     code: `graph TD
     A[Imaging Order Received] --> B{Patient Check-in};
     B --> C[Perform Scan/X-Ray];
@@ -37,9 +40,10 @@ export const diagramExamples: DiagramExample[] = [
     G --> H[Report Sent to Referring Dr.];`
   },
   {
-    title: "Patient Journey Map",
+    title: "[Journey] Patient Journey Map",
     description: "Mapping the patient experience across multiple roles from booking to follow-up.",
     category: "Patient Experience",
+    diagramType: "journey",
     code: `journey
     title Primary Care Visit for Chronic Condition
     section Booking
@@ -56,9 +60,10 @@ export const diagramExamples: DiagramExample[] = [
       Receives results via portal: 5: Patient`
   },
   {
-    title: "Lab Sample Journey",
+    title: "[Sequence] Lab Sample Journey",
     description: "A sequence diagram showing how a sample is processed from collection to analysis.",
     category: "Diagnostic Services",
+    diagramType: "sequence",
     code: `sequenceDiagram
   participant Patient
   participant Phlebotomist
@@ -73,9 +78,10 @@ export const diagramExamples: DiagramExample[] = [
   Analyzer-->>LIS: Acknowledge`
   },
   {
-    title: "Disease Progression Model",
+    title: "[State] Disease Progression Model",
     description: "A state diagram modeling the potential stages of an infectious disease.",
     category: "Epidemiology",
+    diagramType: "state",
     code: `stateDiagram-v2
     [*] --> Susceptible
     Susceptible --> Infected : Exposure
@@ -86,9 +92,10 @@ export const diagramExamples: DiagramExample[] = [
     Deceased --> [*]`
   },
   {
-    title: "Hospital Org Chart",
+    title: "[Flowchart] Hospital Org Chart",
     description: "Shows the hierarchical structure of a hospital's leadership.",
     category: "Administration",
+    diagramType: "flowchart",
     code: `graph TD
     subgraph Hospital Leadership
         A(CEO)
@@ -107,9 +114,10 @@ export const diagramExamples: DiagramExample[] = [
     end`
   },
   {
-    title: "Clinical Trial Timeline",
+    title: "[Gantt] Clinical Trial Timeline",
     description: "A Gantt chart outlining the phases of a new drug trial.",
     category: "Research",
+    diagramType: "gantt",
     code: `gantt
   title Drug XYZ Clinical Trial
   dateFormat  YYYY-MM-DD
@@ -123,9 +131,10 @@ export const diagramExamples: DiagramExample[] = [
     FDA Submission :after Final Analysis, 15d`
   },
   {
-    title: "ER Diagram: Patient Records",
+    title: "[ER] ER Diagram: Patient Records",
     description: "A simple database schema for patients, doctors, and appointments.",
     category: "Health Informatics",
+    diagramType: "er",
     code: `erDiagram
   PATIENT ||--o{ APPOINTMENT : "schedules"
   DOCTOR ||--o{ APPOINTMENT : "attends"
@@ -146,9 +155,10 @@ export const diagramExamples: DiagramExample[] = [
   }`
   },
   {
-    title: "Outbreak Investigation Timeline",
+    title: "[Timeline] Outbreak Investigation Timeline",
     description: "Chronological events during an epidemiological investigation.",
     category: "Epidemiology",
+    diagramType: "timeline",
     code: `timeline
   title Norovirus Outbreak Investigation
   2024-01-10 : First case reported
