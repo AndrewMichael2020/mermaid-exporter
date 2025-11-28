@@ -54,6 +54,43 @@ This application requires two services to be running concurrently: the Next.js f
 
 Your application should now be running at [http://localhost:9005](http://localhost:9005).
 
+## ☁️ Deploy to Cloud Run (via GitHub Actions)
+
+This repository includes a GitHub Actions workflow in `.github/workflows/deploy-cloudrun.yml` that builds a container using Cloud Build and deploys it to Cloud Run.
+
+Prerequisites:
+- A GCP project with Cloud Run enabled
+- A GCP service account key with the roles: `Cloud Run Admin`, `Cloud Build Editor`, `Service Account User`, and `Secret Manager Secret Accessor`
+- GitHub Secrets configured for the repository: `GCP_PROJECT`, `GCP_SA_KEY` (the service account JSON), `CLOUD_RUN_SERVICE`, `CLOUD_RUN_REGION`.
+
+Steps:
+1. Create runtime secrets in Secret Manager (e.g. `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `GEMINI_API_KEY`, etc.)
+2. Grant access to your Cloud Run service account for Secret Manager (Secret Manager -> Add Member -> serviceAccount:<SERVICE_ACCOUNT_EMAIL> -> Secret Manager Secret Accessor)
+3. Configure the GitHub Actions secrets listed above in your repository settings
+4. Push to `main` – the workflow will build the image and deploy it to Cloud Run using the secrets mapped at runtime via `--update-secrets`.
+
+If you want to upload your local `.env.local` values directly to Secret Manager, you can run the helper script (ensure you have the Google Cloud SDK configured and the right permissions):
+
+```sh
+./scripts/upload-secrets.sh <GCP_PROJECT> .env.local
+```
+
+Notes:
+- Client-side Firebase config is fetched from `/api/public-config` at runtime (the server reads `NEXT_PUBLIC_FIREBASE_*` env vars) so the public keys are not embedded at build time.
+- Keep Secrets out of git history; remove any inadvertent commits and rotate compromised keys using GCP Secret Manager and/or GitHub repository settings.
+
+If you have accidentally committed build artifacts or `.env.local` with secrets, you should remove them from git history and rotate the exposed keys. Example commands:
+
+```sh
+# Remove sensitive files from the current branch
+git rm -r --cached .next
+git rm --cached .env.local
+git commit -m "chore: remove build artifacts and sensitive files from repo"
+git push
+
+# To rewrite history, consider using the BFG Repo-Cleaner or git filter-repo, then rotate keys and secrets in GCP.
+``` 
+
 ## 📜 License
 
 Distributed under the MIT License. See `LICENSE` for more information.

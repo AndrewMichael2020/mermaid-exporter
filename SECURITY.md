@@ -60,4 +60,15 @@ This project uses the following key dependencies that handle sensitive operation
 - **Genkit AI**: AI-powered features with Google's Gemini API
 - **Next.js**: Server-side rendering and API routes
 
-We monitor these dependencies for security advisories and update promptly when patches are available.
+Tell them where to go, how often they can expect to get an update on a
+reported vulnerability, what to expect if the vulnerability is accepted or
+declined, etc.
+
+## Handling Secrets
+
+If you find that secrets or API keys were committed to the repository (including in `.env.local` or build artifacts under `.next/`), please do the following immediately:
+
+1. Rotate the affected secrets (rotate API keys in the provider console such as Google Cloud Console or your API provider).
+2. Remove the secret and any committed build artifacts that contain them from the repository's history. You can use tools like `git filter-repo` or the BFG Repo-Cleaner to scrub the history.
+3. Ensure `.env.local` and `.next` are in `.gitignore` and not committed going forward.
+4. Use Secret Manager (e.g., Google Secret Manager) and configure deployment-only mappings (e.g., Cloud Run `--update-secrets`) so secrets are not embedded at build-time.
