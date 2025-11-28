@@ -8,7 +8,7 @@ import {
   onAuthStateChanged,
   User as FirebaseUser
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { initClientFirebase, getAuthInstance } from "@/lib/firebase";
 import { logUserActivity } from "@/lib/logging";
 
 export interface User {
@@ -33,41 +33,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (auth) {
-      const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
-        if (firebaseUser) {
-          const { uid, displayName, email, photoURL } = firebaseUser;
-          const userPayload: User = {
-            uid: uid,
-            name: displayName,
-            email: email,
-            image: photoURL,
-          };
-          setUser(userPayload);
-          localStorage.setItem("mermaid-user-session", JSON.stringify(userPayload));
-          
-          // Only log session start if not already logged
-          logUserActivity(uid, 'session_start', { email });
-          
-          // No need to redirect to /viz anymore as we are on the root page
+    // Initialize the Firebase client and attach an auth listener when ready.
+    let unsub: (() => void) | null = null;
+    let isCancelled = false;
+
+    initClientFirebase()
+      .then(() => {
+        if (isCancelled) return;
+        const auth = getAuthInstance();
+        if (auth) {
+          unsub = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+            if (firebaseUser) {
+              const { uid, displayName, email, photoURL } = firebaseUser;
+              const userPayload: User = {
+                uid: uid,
+                name: displayName,
+                email: email,
+                image: photoURL,
+              };
+              setUser(userPayload);
+              localStorage.setItem("mermaid-user-session", JSON.stringify(userPayload));
+              logUserActivity(uid, 'session_start', { email });
+            } else {
+              setUser(null);
+              localStorage.removeItem("mermaid-user-session");
+            }
+            setLoading(false);
+          });
         } else {
-          setUser(null);
-          localStorage.removeItem("mermaid-user-session");
+          setLoading(false);
         }
+      })
+      .catch((err) => {
+        console.error('Failed to initialize firebase client', err);
         setLoading(false);
       });
 
-      return () => unsubscribe();
-    } else {
-      setLoading(false);
-    }
+    return () => {
+      isCancelled = true;
+      try {
+        if (unsub) unsub();
+      } catch (_) {
+        // noop
+      }
+    };
   }, [router]);
 
   const signIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
+      const auth = getAuthInstance();
       if (auth) {
         await signInWithPopup(auth, provider);
+      } else {
+        console.warn('Auth not initialized at sign-in time');
       }
     } catch (error) {
       console.error("Error signing in with Google", error);
@@ -80,6 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (user?.uid) {
         logUserActivity(user.uid, 'session_end');
       }
+      const auth = getAuthInstance();
       if (auth) {
         await auth.signOut();
       }
