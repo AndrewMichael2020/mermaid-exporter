@@ -62,7 +62,12 @@ jobs:
         run: |
           set -euo pipefail
           gcloud config set project "$PROJECT"
-          gcloud config set run/region "${REGION:-${{ inputs.default-region }}}"
+          # Use provided REGION or fall back to the workflow input 'default-region'
+          if [ -n "${REGION:-}" ]; then
+            gcloud config set run/region "$REGION"
+          else
+            gcloud config set run/region "${{ inputs['default-region'] }}"
+          fi
 
       - name: Verify required secrets exist in Secret Manager
         env:
@@ -94,7 +99,7 @@ jobs:
           SERVICE: ${{ inputs.service }}
         run: |
           set -euo pipefail
-          TAG=${{ inputs.image-tag }}
+          TAG="${{ inputs['image-tag'] }}"
           IMAGE="gcr.io/${PROJECT}/${SERVICE}:${TAG::7}"
           IMAGE_LATEST="gcr.io/${PROJECT}/${SERVICE}:latest"
           echo "Building $IMAGE"
@@ -110,13 +115,18 @@ jobs:
           REGION: ${{ inputs.region }}
         run: |
           set -euo pipefail
-          DEPLOY_REGION="${{ inputs.region:-${{ inputs.default-region }}}}"
-          TAG=${{ inputs.image-tag }}
+          # Determine deploy region: use environment REGION if set, otherwise the workflow input 'default-region'
+          if [ -n "${REGION:-}" ]; then
+            DEPLOY_REGION="$REGION"
+          else
+            DEPLOY_REGION="${{ inputs['default-region'] }}"
+          fi
+          TAG="${{ inputs['image-tag'] }}"
           IMAGE="gcr.io/${PROJECT}/${SERVICE}:${TAG::7}"
           echo "Deploying $SERVICE to Cloud Run ($DEPLOY_REGION)"
           # Map the same secrets from Secret Manager into the service
           update_secrets_args=()
-          IFS=$'\n' read -r -d '' -a secrets <<< "${{ inputs.secrets-to-check }}" || true
+          IFS=$'\n' read -r -d '' -a secrets <<< "${{ inputs['secrets-to-check'] }}" || true
           for s in "${secrets[@]}"; do
             s=$(echo "$s" | xargs)
             if [ -z "$s" ]; then
