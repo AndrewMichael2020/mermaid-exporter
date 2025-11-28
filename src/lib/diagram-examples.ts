@@ -154,7 +154,6 @@ export const diagramExamples: DiagramExample[] = [
     string reason
     int doctor_id
     int patient_id
-  }
   }`
   },
   {
