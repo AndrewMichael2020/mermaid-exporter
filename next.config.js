@@ -1,5 +1,7 @@
 
 /** @type {import('next').NextConfig} */
+const path = require('path');
+
 const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
@@ -29,6 +31,14 @@ const nextConfig = {
       },
     ],
   },
+};
+
+// Add webpack alias to resolve `@/` imports which are used across the project
+nextConfig.webpack = (config) => {
+  if (!config.resolve) config.resolve = {};
+  if (!config.resolve.alias) config.resolve.alias = {};
+  config.resolve.alias['@'] = path.resolve(__dirname, 'src');
+  return config;
 };
 
 module.exports = nextConfig;
