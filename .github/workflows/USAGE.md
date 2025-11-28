@@ -4,7 +4,7 @@ This repository provides two production-ready reusable GitHub Actions workflows 
  
 - **`reusable-ci.yml`** — runs lint, TypeScript type checks and tests.
 - **`reusable-deploy-cloudrun.yml`** — builds a container with Cloud Build and deploys it to Google Cloud Run.
-  
+   
 **Quick Overview**
 - **Caller responsibility:** A repository that calls `reusable-deploy-cloudrun.yml` must provide the `GCP_SA_KEY` secret (service account key JSON) and ensure the required runtime/config secrets exist in the target GCP project's Secret Manager.
 - **Where secrets live:** The deploy workflow verifies secrets exist in Google Secret Manager in the target project; it expects the secret names listed under `secrets-to-check`.
