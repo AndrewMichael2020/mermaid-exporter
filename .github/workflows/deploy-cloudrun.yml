@@ -13,7 +13,7 @@ jobs:
       service: ${{ secrets.CLOUD_RUN_SERVICE }}
       region: ${{ secrets.CLOUD_RUN_REGION }}
       default-region: us-central1
-      image-tag: ${GITHUB_SHA}
+      image-tag: ${{ github.sha }}
       secrets-to-check: |
         NEXT_PUBLIC_FIREBASE_API_KEY
         NEXT_PUBLIC_FIREBASE_PROJECT_ID
