@@ -148,10 +148,13 @@ export const diagramExamples: DiagramExample[] = [
     string name
     string specialty
   }
-  APPOINTPOINTMENT {
+  APPOINTMENT {
     int appointment_id PK
     datetime time
     string reason
+    int doctor_id
+    int patient_id
+  }
   }`
   },
   {
