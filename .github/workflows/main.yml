@@ -85,6 +85,26 @@ jobs:
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Debug GCP credentials file
+        if: ${{ always() }}
+        run: |
+          set -euo pipefail
+          echo "--- BEGIN DEBUG: secrets.GCP_SA_KEY (first 200 chars) ---"
+          # Print a prefix only to avoid leaking the full key in logs unintentionally
+          echo "${{ secrets.GCP_SA_KEY }}" | tr -d '\r' | head -c 200 || true
+          echo "\n--- END DEBUG PREFIX ---\n"
+          echo "Credentials file path: ${GOOGLE_APPLICATION_CREDENTIALS:-<not-set>}"
+          if [ -n "${GOOGLE_APPLICATION_CREDENTIALS:-}" ] && [ -f "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
+            echo "--- BEGIN CREDENTIALS FILE (first 200 chars) ---"
+            head -c 200 "$GOOGLE_APPLICATION_CREDENTIALS" || true
+            echo "\n--- END CREDENTIALS FILE PREFIX ---"
+            ls -l "$GOOGLE_APPLICATION_CREDENTIALS" || true
+          else
+            echo "Credentials file not found or GOOGLE_APPLICATION_CREDENTIALS not set"
+          fi
+          echo "Environment variables containing 'GOOGLE' or 'CLOUD':"
+          env | grep -iE 'google|cloud' || true
+
       - name: Verify gcloud authentication (debug)
         run: |
           set -euo pipefail
