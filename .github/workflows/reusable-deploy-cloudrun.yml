@@ -35,7 +35,7 @@ on:
     secrets:
       GCP_SA_KEY:
         required: true
-
+ 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
