@@ -154,7 +154,12 @@ jobs:
           REGION: ${{ inputs.region }}
         run: |
           set -euo pipefail
-          DEPLOY_REGION="${{ inputs.region:-${{ inputs.default-region }}}}"
+          # Determine deploy region: use environment REGION if set, otherwise the workflow input 'default-region'
+          if [ -n "${REGION:-}" ]; then
+            DEPLOY_REGION="$REGION"
+          else
+            DEPLOY_REGION="${{ inputs['default-region'] }}"
+          fi
           url=$(gcloud run services describe "$SERVICE" \
             --platform managed \
             --region "$DEPLOY_REGION" \
