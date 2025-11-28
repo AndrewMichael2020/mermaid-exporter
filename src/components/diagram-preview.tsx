@@ -45,7 +45,15 @@ export default function DiagramPreview({ code, className }: DiagramPreviewProps)
           });
         }
 
-        const { svg } = await mermaid.render(id, code);
+        // Validate first and avoid render if invalid
+        const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
+        try {
+          await mermaid.parse(cleanCode, { suppressErrors: true });
+        } catch (_) {
+          setError(true);
+          return;
+        }
+        const { svg } = await mermaid.render(id, cleanCode);
         setSvg(svg);
       } catch (e) {
         console.error("Preview render failed", e);

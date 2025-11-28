@@ -1,0 +1,38 @@
+[
+  {
+    "key": "patient-triage-flowchart",
+    "code": "graph TD\n    A[Patient Arrives] --> B{Initial Triage};\n    B -- Critical --> C[Resuscitation Bay];\n    B -- Urgent --> D[Main Treatment Area];\n    B -- Non-Urgent --> E[Waiting Room];\n    E --> F[Re-assessment];\n    F --> D;\n    C --> G[Admit to ICU];\n    D --> H{Discharge or Admit?};\n    H -- Discharge --> I[Discharge Lounge];\n    H -- Admit --> J[Admit to Ward];"
+  },
+  {
+    "key": "radiology-workflow",
+    "code": "graph TD\n    A[Imaging Order Received] --> B{Patient Check-in};\n    B --> C[Perform Scan/X-Ray];\n    C --> D[Image Quality Check];\n    D -- OK --> E[Radiologist Review];\n    D -- Redo --> C;\n    E --> F[Report Dictated];\n    F --> G[Report Transcribed & Signed];\n    G --> H[Report Sent to Referring Dr.];"
+  },
+  {
+    "key": "patient-journey-map",
+    "code": "journey\n    title Primary Care Visit for Chronic Condition\n    section Booking\n      Finds clinic online: 5: Patient\n      Books appointment via phone: 4: Patient, MOA\n    section Visit\n      Check-in & Vitals: 4: Patient, MOA\n      Initial Assessment: 5: Nurse Practitioner\n      Consultation with Doctor: 5: Patient, Doctor\n      Receives prescription & referral: 5: Doctor\n    section Follow-up\n      Schedules specialist appt: 4: MOA\n      Consultation with Specialist: 5: Patient, Specialist\n      Receives results via portal: 5: Patient"
+  },
+  {
+    "key": "lab-sample-journey",
+    "code": "sequenceDiagram\n  participant Patient\n  participant Phlebotomist\n  participant LIS as Lab Information System\n  participant Analyzer as Automated Analyzer\n\n  Patient->>Phlebotomist: Arrives for blood draw\n  Phlebotomist->>LIS: Scan requisition & print labels\n  Phlebotomist->>Patient: Collect sample\n  Phlebotomist->>LIS: Log sample as collected\n  LIS->>Analyzer: Pre-authorize test\n  Analyzer-->>LIS: Acknowledge"
+  },
+  {
+    "key": "disease-progression-model",
+    "code": "stateDiagram-v2\n    [*] --> Susceptible\n    Susceptible --> Infected : Exposure\n    Infected --> Recovered : Treatment/Immunity\n    Infected --> Deceased : Complications\n    Recovered --> Susceptible : Waning Immunity\n    Recovered --> [*]\n    Deceased --> [*]"
+  },
+  {
+    "key": "hospital-org-chart",
+    "code": "graph TD\n    subgraph Hospital Leadership\n        A(CEO)\n        subgraph Medical Staff\n            B(Chief Medical Officer)\n            B --> D(Head of Surgery)\n            B --> E(Head of Medicine)\n        end\n        subgraph Operations\n            C(Chief Operating Officer)\n            C --> F(Director of Nursing)\n            C --> G(Facilities Manager)\n        end\n        A --> B\n        A --> C\n    end"
+  },
+  {
+    "key": "clinical-trial-timeline",
+    "code": "gantt\n  title Drug XYZ Clinical Trial\n  dateFormat  YYYY-MM-DD\n  section Phase 1\n    Recruitment :a1, 2024-01-01, 30d\n    Initial Dosing :after a1, 60d\n  section Phase 2\n    Efficacy Study :2024-04-01, 120d\n  section Data Analysis\n    Final Analysis :2024-08-01, 45d\n    FDA Submission :after Final Analysis, 15d"
+  },
+  {
+    "key": "er-patient-records",
+    "code": "erDiagram\n  PATIENT ||--o{ APPOINTMENT : schedules\n  DOCTOR  ||--o{ APPOINTMENT : attends\n  PATIENT {\n    int patient_id PK\n    string name\n    date date_of_birth\n  }\n  DOCTOR {\n    int doctor_id PK\n    string name\n    string specialty\n  }\n  APPOINTMENT {\n    int appointment_id PK\n    datetime time\n    string reason\n    int doctor_id FK\n    int patient_id FK\n  }\n  "
+  },
+  {
+    "key": "outbreak-investigation-timeline",
+    "code": "timeline\n  title Norovirus Outbreak Investigation\n  2024-01-10 : First case reported\n  2024-01-11 : Public Health unit notified\n  2024-01-12 : Epidemiological interviews begin\n             : Lab samples collected\n  2024-01-14 : Source identified (Restaurant A)\n  2024-01-15 : Public announcement"
+  }
+]
