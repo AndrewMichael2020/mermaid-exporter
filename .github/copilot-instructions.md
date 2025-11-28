@@ -2,7 +2,7 @@ cat > /workspaces/mermaid-exporter/.github/copilot-instructions.md << 'EOF'
 # GitHub Copilot Instructions for mermaid-exporter
 
 ## Workflow & Communication
-- Do not offer options unless necessary; proceed with best practices for a prototype
+- Do not offer options unless necessary; proceed with best practices for a prototype (!) DO NOT OVERWHEALM WITH OPTIONS.
 - Limit output and instruct step by step
 - Work collaboratively: suggest CLI commands, check outputs, proceed with next steps together
 

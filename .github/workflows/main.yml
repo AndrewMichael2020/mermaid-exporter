@@ -100,25 +100,30 @@ jobs:
           echo "All required secrets verified."
 
       - name: Build and push image (Cloud Build)
+        id: build_image
         env:
           GITHUB_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           TAG="${GITHUB_SHA:0:7}"
-          IMAGE="gcr.io/${PROJECT}/${SERVICE}:${TAG}"
+          IMAGE_TAG="gcr.io/${PROJECT}/${SERVICE}:${TAG}"
           IMAGE_LATEST="gcr.io/${PROJECT}/${SERVICE}:latest"
-          echo "Building $IMAGE"
-          gcloud builds submit \
-            --tag "$IMAGE" \
-            --tag "$IMAGE_LATEST" \
-            --timeout=1200s
+          echo "Building $IMAGE_TAG"
+          # Submit build and capture build id
+          BUILD_ID=$(gcloud builds submit --tag "$IMAGE_TAG" --tag "$IMAGE_LATEST" --format='get(id)' --timeout=1200s)
+          echo "Build ID: $BUILD_ID"
+          # Retrieve the pushed image digest from the build results
+          DIGEST=$(gcloud builds describe "$BUILD_ID" --format='get(results.images[0].digest)')
+          echo "Built image digest: $DIGEST"
+          IMAGE_DIGEST="gcr.io/${PROJECT}/${SERVICE}@${DIGEST}"
+          echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Cloud Run
         run: |
           set -euo pipefail
-          TAG="${GITHUB_SHA:0:7}"
-          IMAGE="gcr.io/${PROJECT}/${SERVICE}:${TAG}"
-          echo "Deploying $SERVICE to Cloud Run ($DEFAULT_REGION)"
+          # Use the digest produced by the Cloud Build step to avoid tag race conditions
+          IMAGE="${{ steps.build_image.outputs.IMAGE_DIGEST }}"
+          echo "Deploying $SERVICE to Cloud Run ($DEFAULT_REGION) using image: $IMAGE"
           update_secrets_args=()
           IFS=$'\n' read -r -d '' -a secrets <<< "${{ env.SECRETS_TO_CHECK }}" 2>/dev/null || true
           for s in "${secrets[@]}"; do
