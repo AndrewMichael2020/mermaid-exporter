@@ -112,8 +112,20 @@ jobs:
           # Submit build and capture build id
           BUILD_ID=$(gcloud builds submit --tag "$IMAGE_TAG" --tag "$IMAGE_LATEST" --format='get(id)' --timeout=1200s)
           echo "Build ID: $BUILD_ID"
-          # Retrieve the pushed image digest from the build results
-          DIGEST=$(gcloud builds describe "$BUILD_ID" --format='get(results.images[0].digest)')
+          # Retrieve the pushed image digest from the build results with retry to avoid eventual-consistency 404s
+          DIGEST=""
+          for i in $(seq 1 5); do
+            DIGEST=$(gcloud builds describe "$BUILD_ID" --format='get(results.images[0].digest)' || true)
+            if [ -n "$DIGEST" ]; then
+              break
+            fi
+            echo "Describe build not ready yet (attempt $i). Sleeping 5s..."
+            sleep 5
+          done
+          if [ -z "$DIGEST" ]; then
+            echo "::error::Failed to retrieve image digest for build $BUILD_ID"
+            exit 1
+          fi
           echo "Built image digest: $DIGEST"
           IMAGE_DIGEST="gcr.io/${PROJECT}/${SERVICE}@${DIGEST}"
           echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> "$GITHUB_OUTPUT"

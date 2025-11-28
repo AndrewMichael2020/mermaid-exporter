@@ -136,8 +136,8 @@ export const diagramExamples: DiagramExample[] = [
     category: "Health Informatics",
     diagramType: "er",
     code: `erDiagram
-  PATIENT ||--o{ APPOINTMENT : "schedules"
-  DOCTOR ||--o{ APPOINTMENT : "attends"
+  PATIENT ||--o{ APPOINTMENT : schedules
+  DOCTOR  ||--o{ APPOINTMENT : attends
   PATIENT {
     int patient_id PK
     string name
@@ -152,9 +152,10 @@ export const diagramExamples: DiagramExample[] = [
     int appointment_id PK
     datetime time
     string reason
-    int doctor_id
-    int patient_id
-  }`
+    int doctor_id FK
+    int patient_id FK
+  }
+  `
   },
   {
     title: "[Timeline] Outbreak Investigation Timeline",
