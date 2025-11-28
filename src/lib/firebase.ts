@@ -5,33 +5,59 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
-const firebaseConfig = {
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
-};
+// Lazy-initialized references
+let _app: any = null;
+let _auth: any = null;
+let _db: any = null;
+let _analytics: any = null;
 
-// Initialize Firebase only in the browser to avoid running client SDKs during
-// server-side build/prerender (which can fail if NEXT_PUBLIC_* values are
-// missing or invalid at build time).
-let app: any = null;
-let auth: any = null;
-let db: any = null;
-let analytics: any = null;
+// Initialize client-side Firebase using a runtime endpoint that returns public
+// NEXT_PUBLIC_FIREBASE_* values. This avoids baking secrets into build artifacts.
+export async function initClientFirebase() {
+  if (typeof window === "undefined") return null;
 
-if (typeof window !== "undefined") {
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  auth = getAuth(app);
-  db = getFirestore(app);
+  if (getApps().length) {
+    _app = getApp();
+  } else {
+    // Fetch runtime public config from the server-side endpoint
+    const res = await fetch("/api/public-config");
+    if (!res.ok) {
+      throw new Error("Failed to fetch public Firebase config");
+    }
+    const cfg = await res.json();
 
-  isSupported().then((supported) => {
+    const firebaseConfig = {
+      apiKey: cfg.NEXT_PUBLIC_FIREBASE_API_KEY,
+      projectId: cfg.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      appId: cfg.NEXT_PUBLIC_FIREBASE_APP_ID,
+      authDomain: cfg.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      storageBucket: cfg.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: cfg.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    };
+
+    _app = initializeApp(firebaseConfig);
+  }
+
+  _auth = getAuth(_app);
+  _db = getFirestore(_app);
+
+  isSupported().then((supported: boolean) => {
     if (supported) {
-      analytics = getAnalytics(app);
+      _analytics = getAnalytics(_app);
     }
   });
+
+  return { app: _app, auth: _auth, db: _db, analytics: _analytics };
 }
 
-export { app, auth, db, analytics };
+export function getAuthInstance() {
+  return _auth;
+}
+
+export function getDbInstance() {
+  return _db;
+}
+
+export function getAnalyticsInstance() {
+  return _analytics;
+}

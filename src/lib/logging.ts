@@ -1,4 +1,4 @@
-import { db, analytics } from './firebase';
+import { getDbInstance, getAnalyticsInstance, initClientFirebase } from './firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { logEvent } from 'firebase/analytics';
 
@@ -11,15 +11,35 @@ export const logUserActivity = async (userId: string | undefined, action: string
     const safeDetails = details === undefined ? null : details;
 
     // 1. Log to Firestore (Detailed Database Record)
-    await addDoc(collection(db, 'user_logs'), {
+    let db = getDbInstance();
+    if (!db && typeof window !== 'undefined') {
+      try {
+        await initClientFirebase();
+        db = getDbInstance();
+      } catch (e) {
+        console.error('Failed to initialize firebase for logging', e);
+      }
+    }
+    if (db) {
+      await addDoc(collection(db, 'user_logs'), {
       userId: uid,
       action,
       details: safeDetails,
       timestamp: serverTimestamp(),
       userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'unknown',
     });
+    }
 
     // 2. Log to Google Analytics (Dashboard Trends)
+    let analytics = getAnalyticsInstance();
+    if (!analytics && typeof window !== 'undefined') {
+      try {
+        await initClientFirebase();
+        analytics = getAnalyticsInstance();
+      } catch (e) {
+        console.error('Failed to init firebase analytics for logging', e);
+      }
+    }
     if (analytics) {
       // Google Analytics event names should be alphanumeric and underscores only
       // Mapping common actions to standard GA events where appropriate, or keeping custom names
