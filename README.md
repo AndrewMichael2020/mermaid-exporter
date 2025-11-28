@@ -57,6 +57,17 @@ Your application should now be running at [http://localhost:9005](http://localho
 ## ☁️ Deploy to Cloud Run (via GitHub Actions)
 
 This repository includes a GitHub Actions workflow in `.github/workflows/deploy-cloudrun.yml` that builds a container using Cloud Build and deploys it to Cloud Run.
+Important notes about secrets and deployment
+- Secrets are stored in Google Secret Manager and mapped into Cloud Run at runtime using `--update-secrets`.
+- The deploy workflow and recommended scripts now use `:latest` secret mappings so runtime always reads the most recent enabled secret version (avoid pinning to specific version numbers which can be disabled and cause instance startup failures).
+- Add measurement ID support: the runtime endpoint `/api/public-config` now returns `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID` and the client initializes Firebase Analytics only when a measurement ID is present.
+
+Key rotation guidance
+- To rotate keys or update secrets, add a new secret version in Secret Manager and keep it enabled. Use the helper script `./scripts/upload-secrets.sh` to push local `.env.local` values to Secret Manager and grant access to your runtime service account.
+- After updating secrets, update Cloud Run traffic to the latest revision or redeploy so the new secret version is used. Example:
+```bash
+gcloud run services update-traffic mermaid-exporter --project=YOUR_PROJECT --platform=managed --to-latest
+```
 
 **For comprehensive deployment instructions, see [docs/deployment.md](docs/deployment.md).**
 
@@ -70,6 +81,7 @@ Prerequisites:
 Steps:
 1. Create runtime secrets in Secret Manager (e.g. `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `GEMINI_API_KEY`, etc.)
 2. Grant access to your Cloud Run service account for Secret Manager (Secret Manager -> Add Member -> serviceAccount:<SERVICE_ACCOUNT_EMAIL> -> Secret Manager Secret Accessor)
+    - Ensure the runtime revision service account (often `PROJECT_NUMBER-compute@developer.gserviceaccount.com` or a custom one) has `roles/secretmanager.secretAccessor` on each secret it must read.
 3. Configure the GitHub Actions secrets listed above in your repository settings
 4. Push to `main` – the workflow will build the image and deploy it to Cloud Run using the secrets mapped at runtime via `--update-secrets`.
 

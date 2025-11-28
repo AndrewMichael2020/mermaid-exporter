@@ -43,11 +43,21 @@ export async function initClientFirebase() {
   _auth = getAuth(_app);
   _db = getFirestore(_app);
 
-  isSupported().then((supported: boolean) => {
-    if (supported) {
-      _analytics = getAnalytics(_app);
+    // Only initialize Analytics when a measurementId is present and the runtime
+    // environment supports analytics (e.g., not SSR). This avoids errors in
+    // environments where analytics SDK can't run and prevents creating empty
+    // analytics instances when measurementId is not provided.
+    const measurementId = (typeof window !== 'undefined' && _app?.options?.measurementId) || null;
+    if (measurementId) {
+      isSupported().then((supported: boolean) => {
+        if (supported) {
+          _analytics = getAnalytics(_app);
+        }
+      }).catch((err) => {
+        // eslint-disable-next-line no-console
+        console.warn('Analytics not supported or failed to initialize:', err);
+      });
     }
-  });
 
   return { app: _app, auth: _auth, db: _db, analytics: _analytics };
 }

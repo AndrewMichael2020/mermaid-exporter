@@ -49,8 +49,19 @@ const generateDiagramFlow = ai.defineFlow(
     outputSchema: GenerateDiagramOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    
+    let output;
+    try {
+      const result = await prompt(input);
+      output = result.output;
+    } catch (err) {
+      // Log full error server-side for diagnosis and return a safe message to callers
+      // so production builds don't leak sensitive details in the client error.
+      // The original stack and message will appear in Cloud Run logs.
+      // eslint-disable-next-line no-console
+      console.error('LLM request failed in generateDiagramFlow:', err);
+      throw new Error('Diagram generation failed: upstream language model error.');
+    }
+
     // Sanitize the output to remove unwanted styling commands
     if (output && output.mermaidCode) {
       output.mermaidCode = output.mermaidCode
@@ -60,7 +71,7 @@ const generateDiagramFlow = ai.defineFlow(
         .replace(/```/g, '')
         .trim();
     }
-    
+
     return output!;
   }
 );

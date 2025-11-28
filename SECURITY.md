@@ -72,3 +72,16 @@ If you find that secrets or API keys were committed to the repository (including
 2. Remove the secret and any committed build artifacts that contain them from the repository's history. You can use tools like `git filter-repo` or the BFG Repo-Cleaner to scrub the history.
 3. Ensure `.env.local` and `.next` are in `.gitignore` and not committed going forward.
 4. Use Secret Manager (e.g., Google Secret Manager) and configure deployment-only mappings (e.g., Cloud Run `--update-secrets`) so secrets are not embedded at build-time.
+
+## Secret rotation & runtime safety
+
+- Prefer mapping secrets to `:latest` in Cloud Run (`projects/PROJECT_NUMBER/secrets/NAME:latest`) so new revisions automatically use the most recent enabled secret version. Avoid hard-pinning to numeric secret versions in production unless you manage them deliberately.
+- When rotating a key, add a new secret version and keep it enabled. After upload, update traffic to the latest revision or redeploy so the new version is used; do not immediately disable the old version until the new revision is verified.
+- Grant the Cloud Run runtime revision service account `roles/secretmanager.secretAccessor` on the secrets it needs. If a revision cannot access a secret version (or the referenced version is disabled) the instance startup will abort and log an error.
+
+## Key rotation guidance
+
+- When rotating keys or updating secrets, add a new secret version and keep it enabled. After upload, update Cloud Run traffic to the latest revision or redeploy so the new version is used; consider keeping prior versions enabled until verification completes.
+- Grant the Cloud Run runtime revision service account `roles/secretmanager.secretAccessor` on the secrets it needs.
+
+This guidance helps ensure rotations are seamless and reduces the chance of runtime configuration issues.

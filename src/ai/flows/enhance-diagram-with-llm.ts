@@ -58,8 +58,18 @@ const enhanceDiagramWithLLMFlow = ai.defineFlow(
     outputSchema: EnhanceDiagramWithLLMOutputSchema,
   },
   async input => {
-    const {output} = await enhanceDiagramWithLLMPrompt(input);
-    
+    let output;
+    try {
+      const result = await enhanceDiagramWithLLMPrompt(input);
+      output = result.output;
+    } catch (err) {
+      // Log full error server-side for diagnosis and return a safe message to callers
+      // so production builds don't leak sensitive details in the client error.
+      // eslint-disable-next-line no-console
+      console.error('LLM request failed in enhanceDiagramWithLLMFlow:', err);
+      throw new Error('Diagram enhancement failed: upstream language model error.');
+    }
+
     let enhancedCode = output!.enhancedDiagramCode;
     // The model sometimes wraps the code in ```mermaid ... ```, so we should strip that.
     const codeBlockRegex = /'''(?:mermaid)?\s*([\s\S]*?)\s*'''/;

@@ -36,9 +36,21 @@ jobs:
 **Required secrets and how they are used**
 - **Repository secret:** `GCP_SA_KEY` — raw service account JSON (or base64-encoded JSON) used by the workflow to authenticate `gcloud`.
 - **GCP Secret Manager (in the target project):** the deploy workflow checks presence of the runtime secrets listed in `secrets-to-check`. Typical defaults in this repo are the Firebase client keys and `GEMINI_API_KEY`.
+ - **GCP Secret Manager (in the target project):** the deploy workflow checks presence of the runtime secrets listed in `secrets-to-check`. Typical defaults in this repo are the Firebase client keys and `GEMINI_API_KEY`.
+ - **Use `:latest` for runtime secrets:** The workflows and recommended deployments map secrets using the `:latest` suffix (for example `projects/PROJECT_NUMBER/secrets/NAME:latest`). This avoids breaking autoscaled instances when older secret versions are disabled. Avoid pinning to numeric versions unless you have a specific reason.
 
 **Provisioning & secrets — recommended quick steps**
 - Create a service account for GitHub Actions and grant required roles (allow the SA to deploy Cloud Run, use Cloud Build, and access Secret Manager). Example roles: `roles/run.admin`, `roles/iam.serviceAccountUser`, `roles/cloudbuild.builds.editor`, `roles/secretmanager.secretAccessor`, `roles/storage.admin`.
+
+Notes about runtime service accounts and Secret Manager access
+- Cloud Run revisions read secrets on startup using the revision's runtime service account (often a compute service account or a custom service account). Ensure that the runtime service account has `roles/secretmanager.secretAccessor` on the secrets it must read.
+- When uploading secrets, grant the runtime service account access. Example:
+```bash
+gcloud secrets add-iam-policy-binding NEXT_PUBLIC_FIREBASE_API_KEY \
+  --project=YOUR_PROJECT \
+  --member="serviceAccount:YOUR_RUNTIME_SA" \
+  --role="roles/secretmanager.secretAccessor"
+```
 
 Create SA and key (example):
 ```bash
