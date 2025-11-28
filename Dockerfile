@@ -2,7 +2,7 @@
 # Clean multi-stage Dockerfile for Next.js (Cloud Run)
 ##############################
 
-FROM node:20-alpine AS deps
+FROM node:20-alpine AS deps-stage
 WORKDIR /app
 ENV NODE_ENV=development
 
@@ -14,7 +14,7 @@ RUN npm ci
 
 FROM node:20-alpine AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps-stage /app/node_modules ./node_modules
 COPY . .
 ENV NODE_ENV=production
 RUN npm run build
