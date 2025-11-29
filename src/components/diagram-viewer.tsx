@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { MermaidConfig } from "mermaid";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -10,9 +9,7 @@ import { Download, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme as useNextTheme } from "next-themes";
 import { cn } from "@/lib/utils";
-
-// Dynamically import mermaid to avoid SSR issues
-const mermaidPromise = import("mermaid").then((m) => m.default);
+import { initializeMermaid } from "@/lib/mermaid-config";
 
 interface DiagramViewerProps {
   code: string;
@@ -42,40 +39,27 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
   useEffect(() => {
     const renderDiagram = async () => {
       try {
-        const mermaid = await mermaidPromise;
-        
-        // Cast to allow runtime-only options not present in type defs
-        const config = {
-          startOnLoad: false,
+        // Use centralized mermaid configuration with error suppression
+        const mermaid = await initializeMermaid({
           theme: isDark ? 'dark' : 'default',
-          securityLevel: 'loose',
-          fontFamily: 'Inter, sans-serif',
-          // Suppress the default error messages to rely on our own UI
-          suppressErrors: true,
-        } as unknown as MermaidConfig;
-
-        if (isDark) {
-            config.themeVariables = darkThemeVariables;
-        }
-
-        mermaid.initialize(config);
-
-        // Register a parse error handler to suppress Mermaid's default error box
-        if (typeof mermaid.setParseErrorHandler === 'function') {
-          mermaid.setParseErrorHandler((err: any, hash: any) => {
-            // We prevent Mermaid from adding its own error UI; instead we surface
-            // a concise error message in our viewer's overlay (see catch below).
-            // No-op here is intentional.
-            return;
-          });
-        }
+          themeVariables: isDark ? darkThemeVariables : undefined,
+        });
 
         if (viewerRef.current && code) {
           try {
             // The model sometimes adds classDef, which can interfere with themes.
             // We will strip it before parsing to be safe.
             const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
-            await mermaid.parse(cleanCode, { suppressErrors: true }); // validation
+            
+            // Validate code before rendering to prevent bomb widget from appearing
+            const isValid = await mermaid.parse(cleanCode, { suppressErrors: true });
+            if (isValid === false) {
+              setError("Invalid Mermaid syntax. Please check your code.");
+              if (viewerRef.current) {
+                viewerRef.current.innerHTML = '';
+              }
+              return;
+            }
             
             const { svg } = await mermaid.render(
               "mermaid-svg-" + Date.now(),
@@ -86,9 +70,10 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
               viewerRef.current.innerHTML = svg;
             }
             setError(null);
-          } catch(e: any) {
+          } catch(e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : String(e);
             console.error("Mermaid rendering error:", e);
-            setError(e.message || e.str || "Invalid Mermaid syntax. Please check your code.");
+            setError(errorMessage || "Invalid Mermaid syntax. Please check your code.");
             if (viewerRef.current) {
               viewerRef.current.innerHTML = '';
             }
@@ -140,17 +125,11 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
     }
 
     try {
-        const mermaid = await mermaidPromise;
-        const config: MermaidConfig = {
-            startOnLoad: false,
-            theme: isDark ? 'dark' : 'default',
-            securityLevel: 'loose',
-            fontFamily: 'Inter, sans-serif',
-        };
-        if (isDark) {
-            config.themeVariables = darkThemeVariables;
-        }
-        mermaid.initialize(config);
+        // Use centralized mermaid configuration with error suppression
+        const mermaid = await initializeMermaid({
+          theme: isDark ? 'dark' : 'default',
+          themeVariables: isDark ? darkThemeVariables : undefined,
+        });
 
         const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
 
