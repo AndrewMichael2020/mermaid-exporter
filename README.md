@@ -8,7 +8,7 @@
 
 An AI-powered application that makes creating professional diagrams as easy as describing what you need. Built with Next.js and powered by Google Gemini AI.
 
-🌐 **[Try it live](https://mermaid-exporter-r34k7xewoa-uc.a.run.app)** (deployed on Google Cloud Run)
+🌐 **Deploy on Google Cloud Run and try it out**
 
 ![Mermaid Cloud Viz Screenshot](docs/gallery-1.png)
 
@@ -105,7 +105,7 @@ Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more informati
 ## 🙏 Acknowledgments
 
 - [Mermaid.js](https://mermaid.js.org) — The diagram rendering engine
-- [Google Gemini](https://ai.google.dev) — AI model powering diagram generation
+- [Google OpenAI and Gemini](https://ai.google.dev) — AI models powering diagram generation
 - [Next.js](https://nextjs.org) — React framework
 - [Tailwind CSS](https://tailwindcss.com) — Styling framework
 - [shadcn/ui](https://ui.shadcn.com) — UI components
@@ -119,4 +119,4 @@ Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more informati
 
 ---
 
-**Made with ❤️ using AI and open source**
+**Made with ❤️ using open source and AI**
