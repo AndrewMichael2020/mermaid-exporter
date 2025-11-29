@@ -76,5 +76,33 @@ export const diagramExamples: DiagramExample[] = [
     category: "Epidemiology",
     diagramType: "timeline",
     code: getCode('outbreak-investigation-timeline')
+  },
+  {
+    title: "[Class] Patient Encounters",
+    description: "UML class diagram showing core domain objects for patient encounters including Person, Patient, Encounter, and Provider relationships.",
+    category: "Health Informatics",
+    diagramType: "class",
+    code: getCode('patient-encounters-class')
+  },
+  {
+    title: "[Pie] Visit Share by Setting",
+    description: "Pie chart visualizing the distribution of healthcare visits across different care settings.",
+    category: "Healthcare Analytics",
+    diagramType: "pie",
+    code: getCode('visit-share-by-setting')
+  },
+  {
+    title: "[Mindmap] Frail Senior Care Pathway",
+    description: "Mindmap outlining the care pathway for frail seniors from intake through outcomes.",
+    category: "Clinical Workflow",
+    diagramType: "mindmap",
+    code: getCode('frail-senior-care-pathway')
+  },
+  {
+    title: "[Git] Sustainability Dashboard Release Flow",
+    description: "Git graph modeling an internal analytics repository release workflow with feature branches.",
+    category: "Development",
+    diagramType: "gitgraph",
+    code: getCode('sustainability-dashboard-release')
   }
 ];
