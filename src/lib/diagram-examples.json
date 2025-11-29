@@ -34,5 +34,21 @@
   {
     "key": "outbreak-investigation-timeline",
     "code": "timeline\n  title Norovirus Outbreak Investigation\n  2024-01-10 : First case reported\n  2024-01-11 : Public Health unit notified\n  2024-01-12 : Epidemiological interviews begin\n             : Lab samples collected\n  2024-01-14 : Source identified (Restaurant A)\n  2024-01-15 : Public announcement"
+  },
+  {
+    "key": "patient-encounters-class",
+    "code": "classDiagram\n    class Person {\n        +String name\n        +Date dateOfBirth\n        +String address\n    }\n    class Patient {\n        +String patientID\n        +String locationID\n        +String insuranceInfo\n    }\n    class Encounter {\n        +String encounterId\n        +Date visitDate\n        +String location\n        +String providerId\n        +String visitType\n    }\n    class Provider {\n        +String providerId\n        +String discipline\n        +String clinicID\n        +String credentials\n    }\n    Person <|-- Patient\n    Patient \"1\" --> \"*\" Encounter : has\n    Encounter \"*\" --> \"1\" Provider : attendedBy"
+  },
+  {
+    "key": "visit-share-by-setting",
+    "code": "pie showData\n    title Visit Share by Setting\n    \"Primary Care Clinic\" : 20\n    \"Emergency Dept\" : 35\n    \"Mental Health Center\" : 15\n    \"Outpatient\" : 20\n    \"Other\" : 10"
+  },
+  {
+    "key": "frail-senior-care-pathway",
+    "code": "mindmap\n  root((Frail Senior Care Pathway))\n    Intake & Triage\n      Referral\n      Initial Assessment\n    Clinic Visits\n      Primary Care\n      Outpatient Clinic\n    Support Services\n      Home Health\n      Rehab\n      Social Work\n    Outcomes\n      Avoided ED\n      Follow-up Plan"
+  },
+  {
+    "key": "sustainability-dashboard-release",
+    "code": "gitGraph\n    commit id: \"init\"\n    branch develop\n    commit id: \"setup-ci\"\n    commit id: \"add-base-metrics\"\n    branch feature/energy-intensity-kpi\n    commit id: \"add-energy-kpi\"\n    commit id: \"add-unit-tests\"\n    checkout develop\n    merge feature/energy-intensity-kpi id: \"merge-energy-kpi\"\n    commit id: \"update-docs\"\n    checkout main\n    merge develop id: \"release-v1.0\"\n    commit id: \"tag-v1.0\""
   }
 ]
