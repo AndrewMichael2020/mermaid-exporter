@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import mermaid from "mermaid";
 import { cn } from "@/lib/utils";
+import { initializeMermaid } from "@/lib/mermaid-config";
 
 interface DiagramPreviewProps {
   code: string;
@@ -25,31 +25,15 @@ export default function DiagramPreview({ code, className }: DiagramPreviewProps)
         // Use a separate ID for each preview to avoid conflicts
         const id = `preview-${Math.random().toString(36).substr(2, 9)}`;
         
-        // Initialize with a safe config for previews
-        // Use a relaxed type for the mermaid config because some runtime options
-        // (like suppressErrorRendering) may not be present in the TS definitions
-        const previewConfig = {
-          startOnLoad: false,
+        // Use centralized mermaid configuration with error suppression
+        const mermaid = await initializeMermaid({
           theme: 'base', // Neutral theme for gallery
-          securityLevel: 'loose',
-          fontFamily: 'Inter, sans-serif',
-          // Suppress Mermaid's default error rendering and let our UI handle errors
-          suppressErrors: true,
-        } as unknown as import('mermaid').MermaidConfig;
-
-        mermaid.initialize(previewConfig);
-        // Prevent Mermaid from injecting its own error UI
-        if (typeof mermaid.setParseErrorHandler === 'function') {
-          mermaid.setParseErrorHandler(() => {
-            // no-op: we prefer to show our own error message
-          });
-        }
+        });
 
         // Validate first and avoid render if invalid
         const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
-        try {
-          await mermaid.parse(cleanCode, { suppressErrors: true });
-        } catch (_) {
+        const isValid = await mermaid.parse(cleanCode, { suppressErrors: true });
+        if (isValid === false) {
           setError(true);
           return;
         }
