@@ -4,9 +4,9 @@
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Code, BrainCircuit, Wand2, RotateCw } from "lucide-react";
+import { Code, BrainCircuit, Wand2, RotateCw, Info } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +16,12 @@ import {
   generateDiagram,
   enhanceDiagramWithLLM,
 } from "@/ai/flows";
+import {
+  detectDiagramType,
+  detectUnsupportedStyling,
+  getThemingLimitationMessage,
+  MERMAID_VERSION,
+} from "@/lib/theming-utils";
 
 interface DiagramEditorProps {
   code: string;
@@ -30,6 +36,30 @@ export default function DiagramEditor({ code, onCodeChange }: DiagramEditorProps
   const [isEnhancing, setIsEnhancing] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  // Detect theming limitations based on current code
+  const themingInfo = useMemo(() => {
+    const diagramType = detectDiagramType(code);
+    const unsupportedStyling = detectUnsupportedStyling(code);
+    const limitationMessage = getThemingLimitationMessage(diagramType);
+    
+    return {
+      diagramType,
+      unsupportedStyling,
+      limitationMessage,
+      showInfo: diagramType === 'classDiagram' || diagramType === 'sequenceDiagram' || unsupportedStyling.hasUnsupportedAttempt,
+    };
+  }, [code]);
+
+  // Show toast for unsupported styling attempts
+  useEffect(() => {
+    if (themingInfo.unsupportedStyling.hasUnsupportedAttempt && themingInfo.unsupportedStyling.message) {
+      toast({
+        title: "Theming Limitation",
+        description: themingInfo.unsupportedStyling.message,
+      });
+    }
+  }, [themingInfo.unsupportedStyling.hasUnsupportedAttempt, themingInfo.unsupportedStyling.message, toast]);
 
   const checkAuth = () => {
     if (!user) {
@@ -131,7 +161,7 @@ export default function DiagramEditor({ code, onCodeChange }: DiagramEditorProps
         
         {/* Code Tab Content */}
         {activeTab === "code" && (
-          <div className="flex flex-col flex-1 p-4 h-full">
+          <div className="flex flex-col flex-1 p-4 h-full gap-2">
             <Textarea
               placeholder="Paste your Mermaid code here..."
               value={code}
@@ -139,6 +169,23 @@ export default function DiagramEditor({ code, onCodeChange }: DiagramEditorProps
               className="w-full min-h-full resize-y font-mono text-sm"
               aria-label="Mermaid code editor"
             />
+            {/* Theming limitation info - non-blocking inline message */}
+            {themingInfo.showInfo && themingInfo.limitationMessage && (
+              <div className="flex items-start gap-2 p-2 text-xs text-muted-foreground bg-muted/50 rounded-md border border-border/50">
+                <Info className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-500" />
+                <span>
+                  {themingInfo.limitationMessage}{' '}
+                  <a 
+                    href="/docs/theming_support.md" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="underline hover:text-foreground"
+                  >
+                    See docs
+                  </a>
+                </span>
+              </div>
+            )}
           </div>
         )}
 
