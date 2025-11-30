@@ -47,12 +47,8 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
 
         if (viewerRef.current && code) {
           try {
-            // The model sometimes adds classDef, which can interfere with themes.
-            // We will strip it before parsing to be safe.
-            const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
-            
             // Validate code before rendering to prevent bomb widget from appearing
-            const isValid = await mermaid.parse(cleanCode, { suppressErrors: true });
+            const isValid = await mermaid.parse(code, { suppressErrors: true });
             if (isValid === false) {
               setError("Invalid Mermaid syntax. Please check your code.");
               if (viewerRef.current) {
@@ -63,7 +59,7 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
             
             const { svg } = await mermaid.render(
               "mermaid-svg-" + Date.now(),
-              cleanCode // Use cleaned code
+              code // Preserve classDef/class styling
             );
             
             if (viewerRef.current) {
@@ -131,9 +127,7 @@ export default function DiagramViewer({ code, theme: selectedTheme, setTheme }: 
           themeVariables: isDark ? darkThemeVariables : undefined,
         });
 
-        const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
-
-        let { svg } = await mermaid.render("mermaid-download-svg-" + Date.now(), cleanCode);
+        let { svg } = await mermaid.render("mermaid-download-svg-" + Date.now(), code);
         
         // Sanitize <br> tags to be XML-compliant
         svg = svg.replace(/<br>/g, '<br/>');
