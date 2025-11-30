@@ -37,8 +37,53 @@ const enhanceDiagramWithLLMPrompt = ai.definePrompt({
 
   When the user asks to "add 'X' under 'Y'", you should interpret this as a hierarchical relationship. Create a new node for 'X' and draw a one-way arrow from 'Y' to 'X' (e.g., Y --> X). Do not create loops or bidirectional arrows unless specifically asked.
 
-  IMPORTANT: Do not add any 'classDef', 'linkStyle', or other styling commands. The styling is handled by a theme selector.
-  You will be penalized if you add any styling.
+  IMPORTANT THEMING GUIDELINES:
+  1. If the original diagram code contains a theme initialization block (%%{init: {...}}%%), PRESERVE it in your output.
+  2. If the original diagram does NOT have a theme block and the diagram type is NOT erDiagram (ER diagrams), ADD a theme initialization block at the beginning.
+     
+     For flowchart/graph, classDiagram, stateDiagram use:
+     %%{init: {
+       "theme": "base",
+       "themeVariables": {
+         "primaryColor": "#E6F7FF",
+         "primaryBorderColor": "#0A84C1",
+         "primaryTextColor": "#003A57",
+         "secondaryColor": "#EAF7EA",
+         "secondaryBorderColor": "#4CAF50",
+         "secondaryTextColor": "#1B5E20",
+         "tertiaryColor": "#FFF8D6",
+         "tertiaryBorderColor": "#D69E00",
+         "tertiaryTextColor": "#705400",
+         "lineColor": "#0A84C1",
+         "fontFamily": "Inter, sans-serif"
+       }
+     }}%%
+     
+     For sequenceDiagram use:
+     %%{init: {
+       "theme": "base",
+       "themeVariables": {
+         "actorBkg": "#E6F7FF",
+         "actorBorder": "#0A84C1",
+         "actorTextColor": "#003A57",
+         "signalColor": "#0A84C1",
+         "signalTextColor": "#003A57",
+         "labelBoxBkgColor": "#EAF7EA",
+         "labelBoxBorderColor": "#4CAF50",
+         "labelTextColor": "#1B5E20",
+         "loopTextColor": "#705400",
+         "noteBkgColor": "#FFF8D6",
+         "noteBorderColor": "#D69E00",
+         "noteTextColor": "#705400",
+         "fontFamily": "Inter, sans-serif"
+       }
+     }}%%
+     
+     For other diagram types (timeline, gantt, gitGraph, journey, mindmap, pie), use the flowchart themeVariables format as a base.
+     
+  3. For erDiagram (ER diagrams), do NOT add or modify any theme blocks. Keep the code clean without styling.
+  4. If the user specifically requests color or theme changes, update the themeVariables accordingly.
+  5. You MAY also use classDef and class styling for flowcharts when appropriate.
 
   Original Diagram Code:
   '''mermaid
@@ -71,14 +116,19 @@ const enhanceDiagramWithLLMFlow = ai.defineFlow(
 
     let enhancedCode = output!.enhancedDiagramCode;
     // The model sometimes wraps the code in ```mermaid ... ```, so we should strip that.
+    // Preserve theme/styling blocks and classDef commands.
     const codeBlockRegex = /'''(?:mermaid)?\s*([\s\S]*?)\s*'''/;
     const match = codeBlockRegex.exec(enhancedCode);
     if (match) {
       enhancedCode = match[1].trim();
     }
 
-    // Also strip out any classDef that the model might have added.
-    enhancedCode = enhancedCode.replace(/^\s*classDef\s.*$/gm, '').trim();
+    // Also remove markdown code fences (backticks) if present
+    // The regex above handles triple quotes ('''), but model may also use backticks
+    enhancedCode = enhancedCode
+      .replace(/```mermaid/g, '')
+      .replace(/```/g, '')
+      .trim();
 
     return {
       enhancedDiagramCode: enhancedCode,
