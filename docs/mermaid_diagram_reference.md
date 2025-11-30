@@ -1,7 +1,9 @@
 
 # Mermaid Diagram Types — Reference & Examples
 
-This document outlines the major diagram/chart types supported by Mermaid (version ≈ 11+) along with minimal working code examples.
+This document outlines the major diagram/chart types supported by Mermaid (version 10.9.x) along with minimal working code examples.
+
+> **Theming Support:** For detailed information about theming capabilities per diagram type, see [Theming Support Reference](./theming_support.md). For colorized examples, see the [examples/](./examples/) folder.
 
 ## 1. Flowchart
 ```mermaid
