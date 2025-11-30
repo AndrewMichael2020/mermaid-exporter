@@ -39,8 +39,9 @@ const enhanceDiagramWithLLMPrompt = ai.definePrompt({
 
   IMPORTANT THEMING GUIDELINES:
   1. If the original diagram code contains a theme initialization block (%%{init: {...}}%%), PRESERVE it in your output.
-  2. If the original diagram does NOT have a theme block and the diagram type is NOT erDiagram (ER diagrams), ADD a theme initialization block at the beginning with the following format:
+  2. If the original diagram does NOT have a theme block and the diagram type is NOT erDiagram (ER diagrams), ADD a theme initialization block at the beginning.
      
+     For flowchart/graph, classDiagram, stateDiagram use:
      %%{init: {
        "theme": "base",
        "themeVariables": {
@@ -57,6 +58,28 @@ const enhanceDiagramWithLLMPrompt = ai.definePrompt({
          "fontFamily": "Inter, sans-serif"
        }
      }}%%
+     
+     For sequenceDiagram use:
+     %%{init: {
+       "theme": "base",
+       "themeVariables": {
+         "actorBkg": "#E6F7FF",
+         "actorBorder": "#0A84C1",
+         "actorTextColor": "#003A57",
+         "signalColor": "#0A84C1",
+         "signalTextColor": "#003A57",
+         "labelBoxBkgColor": "#EAF7EA",
+         "labelBoxBorderColor": "#4CAF50",
+         "labelTextColor": "#1B5E20",
+         "loopTextColor": "#705400",
+         "noteBkgColor": "#FFF8D6",
+         "noteBorderColor": "#D69E00",
+         "noteTextColor": "#705400",
+         "fontFamily": "Inter, sans-serif"
+       }
+     }}%%
+     
+     For other diagram types (timeline, gantt, gitGraph, journey, mindmap, pie), use the flowchart themeVariables format as a base.
      
   3. For erDiagram (ER diagrams), do NOT add or modify any theme blocks. Keep the code clean without styling.
   4. If the user specifically requests color or theme changes, update the themeVariables accordingly.
@@ -100,7 +123,8 @@ const enhanceDiagramWithLLMFlow = ai.defineFlow(
       enhancedCode = match[1].trim();
     }
 
-    // Also remove markdown code fences if present
+    // Also remove markdown code fences (backticks) if present
+    // The regex above handles triple quotes ('''), but model may also use backticks
     enhancedCode = enhancedCode
       .replace(/```mermaid/g, '')
       .replace(/```/g, '')

@@ -37,8 +37,9 @@ const prompt = ai.definePrompt({
   1. If a node label contains special characters (like parentheses, brackets, or quotes), you MUST wrap the label in double quotes.
      Example: A["Node with (parentheses)"] --> B["Another Node"]
   2. Ensure all brackets are properly closed.
-  3. THEMING AND COLORS: For all diagram types EXCEPT erDiagram (ER diagrams), include a theme initialization block at the very beginning of the code with colorful styling. Use the following format:
+  3. THEMING AND COLORS: For all diagram types EXCEPT erDiagram (ER diagrams), include a theme initialization block at the very beginning of the code with colorful styling.
      
+     For flowchart/graph, classDiagram, stateDiagram use:
      %%{init: {
        "theme": "base",
        "themeVariables": {
@@ -56,13 +57,28 @@ const prompt = ai.definePrompt({
        }
      }}%%
      
-     Use appropriate themeVariables based on the diagram type:
-     - For flowchart/graph: use primaryColor, secondaryColor, tertiaryColor for nodes
-     - For sequenceDiagram: use actorBkg, actorBorder, actorTextColor, signalColor, signalTextColor
-     - For stateDiagram: use primaryColor, primaryBorderColor, primaryTextColor
-     - For classDiagram: use primaryColor, primaryBorderColor, primaryTextColor
-     - For other diagram types (timeline, gantt, gitGraph, journey, mindmap, pie): include relevant themeVariables that enhance visual appearance
+     For sequenceDiagram use:
+     %%{init: {
+       "theme": "base",
+       "themeVariables": {
+         "actorBkg": "#E6F7FF",
+         "actorBorder": "#0A84C1",
+         "actorTextColor": "#003A57",
+         "signalColor": "#0A84C1",
+         "signalTextColor": "#003A57",
+         "labelBoxBkgColor": "#EAF7EA",
+         "labelBoxBorderColor": "#4CAF50",
+         "labelTextColor": "#1B5E20",
+         "loopTextColor": "#705400",
+         "noteBkgColor": "#FFF8D6",
+         "noteBorderColor": "#D69E00",
+         "noteTextColor": "#705400",
+         "fontFamily": "Inter, sans-serif"
+       }
+     }}%%
      
+     For other diagram types (timeline, gantt, gitGraph, journey, mindmap, pie), use the flowchart themeVariables format as a base.
+      
   4. For erDiagram (ER diagrams), do NOT include any theme initialization block. Keep the code clean without styling.
 
   Description: {{{description}}}`,
