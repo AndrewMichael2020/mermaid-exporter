@@ -43,6 +43,9 @@ export default function GalleryPage() {
             Mermaid.js supports a wide variety of diagram types. Browse the collection below, 
             preview them live, and click "Use Template" to start editing or asking AI to customize it for you.
           </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Examples use Mermaid v10+ syntax; if targeting another Mermaid version, verify compatibility.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

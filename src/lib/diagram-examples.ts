@@ -104,5 +104,33 @@ export const diagramExamples: DiagramExample[] = [
     category: "Development",
     diagramType: "gitgraph",
     code: getCode('sustainability-dashboard-release')
+  },
+  {
+    title: "[sankey-beta] Hospital Blood Supply & Usage Sankey",
+    description: "Visualizes monthly blood component flows from donation sites through processing to clinical consumption (surgery, ICU, oncology) and losses/waste. Values are units per month (approximate for a regional hospital group).",
+    category: "Healthcare Analytics",
+    diagramType: "sankey-beta",
+    code: getCode('hospital-blood-supply-sankey')
+  },
+  {
+    title: "[quadrantChart] Vaccine Outreach: Reach vs Adoption",
+    description: "Compares vaccination program performance across community clinics by reach (x-axis: fraction of eligible population contacted) and adoption (y-axis: percent of contacted people who vaccinated). Quadrant labels give action guidance for public health teams.",
+    category: "Public Health",
+    diagramType: "quadrantChart",
+    code: getCode('vaccine-outreach-quadrant')
+  },
+  {
+    title: "[radar-beta] Cancer Biomarker Panel Radar",
+    description: "Compares normalized biomarker panel scores (0–100) for two treatment protocols. Useful to visualize multi-dimensional response across key biomarkers (e.g., ctDNA, CEA, CA-125, PD-L1 expression, T-cell infiltration).",
+    category: "Research",
+    diagramType: "radar-beta",
+    code: getCode('cancer-biomarker-radar')
+  },
+  {
+    title: "[sankey-beta] Hospital Patient Flow Sankey",
+    description: "Visualizes patient throughput from Emergency Department triage to disposition (admit to ward, surgery, observation, discharge) for a typical month. Useful for capacity planning.",
+    category: "Clinical Workflow",
+    diagramType: "sankey-beta",
+    code: getCode('hospital-patient-flow-sankey')
   }
 ];
