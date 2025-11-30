@@ -95,7 +95,8 @@ export type DiagramType = keyof typeof DIAGRAM_THEMING_SUPPORT;
 export function detectDiagramType(code: string): DiagramType | 'unknown' {
   const trimmedCode = code.trim().toLowerCase();
   
-  // Remove init block if present for cleaner detection (use [\s\S] instead of . with s flag for compatibility)
+  // Remove init block if present for cleaner detection
+  // Use [\s\S] instead of . with s flag for ES5/older JS engine compatibility
   const codeWithoutInit = trimmedCode.replace(/%%\{[\s\S]*?\}%%/g, '').trim();
   const firstLine = codeWithoutInit.split('\n')[0].trim();
   
@@ -108,6 +109,7 @@ export function detectDiagramType(code: string): DiagramType | 'unknown' {
   if (firstLine.startsWith('sequencediagram')) {
     return 'sequenceDiagram';
   }
+  // Match both 'statediagram' and 'statediagram-v2' (v2 is the preferred syntax)
   if (firstLine.startsWith('statediagram')) {
     return 'stateDiagram';
   }

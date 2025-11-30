@@ -1,6 +1,6 @@
 # Mermaid Theming Support Reference
 
-This document describes the theming and styling capabilities for each diagram type in Mermaid v10.9.x, as used by this application.
+This document describes the theming and styling capabilities for each diagram type in Mermaid v10.9.1, as used by this application.
 
 ## Overview
 

@@ -30,6 +30,10 @@ describe('theming-utils', () => {
       expect(detectDiagramType('stateDiagram-v2\n    [*] --> Idle')).toBe('stateDiagram');
     });
 
+    it('detects stateDiagram without v2 suffix', () => {
+      expect(detectDiagramType('stateDiagram\n    [*] --> Idle')).toBe('stateDiagram');
+    });
+
     it('detects erDiagram', () => {
       expect(detectDiagramType('erDiagram\n    CUSTOMER ||--o{ ORDER')).toBe('erDiagram');
     });

@@ -176,7 +176,7 @@ export default function DiagramEditor({ code, onCodeChange }: DiagramEditorProps
                 <span>
                   {themingInfo.limitationMessage}{' '}
                   <a 
-                    href="/docs/theming_support.md" 
+                    href="https://github.com/AndrewMichael2020/mermaid-exporter/blob/main/docs/theming_support.md" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="underline hover:text-foreground"
