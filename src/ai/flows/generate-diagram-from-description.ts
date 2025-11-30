@@ -34,10 +34,36 @@ const prompt = ai.definePrompt({
   You will generate Mermaid code based on the user's description. Ensure the generated code is valid Mermaid code.
   
   IMPORTANT GUIDELINES:
-  1. Do not add any 'classDef', 'linkStyle', or other styling commands. The styling is handled by a theme selector.
-  2. If a node label contains special characters (like parentheses, brackets, or quotes), you MUST wrap the label in double quotes.
+  1. If a node label contains special characters (like parentheses, brackets, or quotes), you MUST wrap the label in double quotes.
      Example: A["Node with (parentheses)"] --> B["Another Node"]
-  3. Ensure all brackets are properly closed.
+  2. Ensure all brackets are properly closed.
+  3. THEMING AND COLORS: For all diagram types EXCEPT erDiagram (ER diagrams), include a theme initialization block at the very beginning of the code with colorful styling. Use the following format:
+     
+     %%{init: {
+       "theme": "base",
+       "themeVariables": {
+         "primaryColor": "#E6F7FF",
+         "primaryBorderColor": "#0A84C1",
+         "primaryTextColor": "#003A57",
+         "secondaryColor": "#EAF7EA",
+         "secondaryBorderColor": "#4CAF50",
+         "secondaryTextColor": "#1B5E20",
+         "tertiaryColor": "#FFF8D6",
+         "tertiaryBorderColor": "#D69E00",
+         "tertiaryTextColor": "#705400",
+         "lineColor": "#0A84C1",
+         "fontFamily": "Inter, sans-serif"
+       }
+     }}%%
+     
+     Use appropriate themeVariables based on the diagram type:
+     - For flowchart/graph: use primaryColor, secondaryColor, tertiaryColor for nodes
+     - For sequenceDiagram: use actorBkg, actorBorder, actorTextColor, signalColor, signalTextColor
+     - For stateDiagram: use primaryColor, primaryBorderColor, primaryTextColor
+     - For classDiagram: use primaryColor, primaryBorderColor, primaryTextColor
+     - For other diagram types (timeline, gantt, gitGraph, journey, mindmap, pie): include relevant themeVariables that enhance visual appearance
+     
+  4. For erDiagram (ER diagrams), do NOT include any theme initialization block. Keep the code clean without styling.
 
   Description: {{{description}}}`,
 });
@@ -61,11 +87,9 @@ const generateDiagramFlow = ai.defineFlow(
       throw new Error('Diagram generation failed: upstream language model error.');
     }
 
-    // Sanitize the output to remove unwanted styling commands
+    // Clean up markdown code fences if present, but preserve theme/styling blocks
     if (output && output.mermaidCode) {
       output.mermaidCode = output.mermaidCode
-        .replace(/^\s*classDef\s.*$/gm, '')
-        .replace(/^\s*linkStyle\s.*$/gm, '')
         .replace(/```mermaid/g, '')
         .replace(/```/g, '')
         .trim();

@@ -31,13 +31,13 @@ export default function DiagramPreview({ code, className }: DiagramPreviewProps)
         });
 
         // Validate first and avoid render if invalid
-        const cleanCode = code.replace(/^\s*classDef\s.*$/gm, '');
-        const isValid = await mermaid.parse(cleanCode, { suppressErrors: true });
+        // Preserve classDef/class styling for proper theming
+        const isValid = await mermaid.parse(code, { suppressErrors: true });
         if (isValid === false) {
           setError(true);
           return;
         }
-        const { svg } = await mermaid.render(id, cleanCode);
+        const { svg } = await mermaid.render(id, code);
         setSvg(svg);
       } catch (e) {
         console.error("Preview render failed", e);
