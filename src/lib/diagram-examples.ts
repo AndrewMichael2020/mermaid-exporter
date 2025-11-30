@@ -120,13 +120,6 @@ export const diagramExamples: DiagramExample[] = [
     code: getCode('vaccine-outreach-quadrant')
   },
   {
-    title: "[radar-beta] Cancer Biomarker Panel Radar",
-    description: "Compares normalized biomarker panel scores (0–100) for two treatment protocols. Useful to visualize multi-dimensional response across key biomarkers (e.g., ctDNA, CEA, CA-125, PD-L1 expression, T-cell infiltration).",
-    category: "Research",
-    diagramType: "radar-beta",
-    code: getCode('cancer-biomarker-radar')
-  },
-  {
     title: "[sankey-beta] Hospital Patient Flow Sankey",
     description: "Visualizes patient throughput from Emergency Department triage to disposition (admit to ward, surgery, observation, discharge) for a typical month. Useful for capacity planning.",
     category: "Clinical Workflow",
