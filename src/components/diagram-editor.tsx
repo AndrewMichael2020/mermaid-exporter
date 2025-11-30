@@ -161,17 +161,17 @@ export default function DiagramEditor({ code, onCodeChange }: DiagramEditorProps
         
         {/* Code Tab Content */}
         {activeTab === "code" && (
-          <div className="flex flex-col flex-1 p-4 h-full gap-2">
+          <div className="flex flex-col flex-1 p-4 gap-2 min-h-0">
             <Textarea
               placeholder="Paste your Mermaid code here..."
               value={code}
               onChange={(e) => onCodeChange(e.target.value)}
-              className="w-full min-h-full resize-y font-mono text-sm"
+              className="w-full flex-1 resize-y font-mono text-sm min-h-[200px]"
               aria-label="Mermaid code editor"
             />
             {/* Theming limitation info - non-blocking inline message */}
             {themingInfo.showInfo && themingInfo.limitationMessage && (
-              <div className="flex items-start gap-2 p-2 text-xs text-muted-foreground bg-muted/50 rounded-md border border-border/50">
+              <div className="flex items-start gap-2 p-2 text-xs text-muted-foreground bg-muted/50 rounded-md border border-border/50 flex-shrink-0">
                 <Info className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-500" />
                 <span>
                   {themingInfo.limitationMessage}{' '}
