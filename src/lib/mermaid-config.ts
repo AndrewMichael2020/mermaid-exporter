@@ -43,12 +43,17 @@ export async function getMermaidInstance() {
       }
     } catch (esmError) {
       // Fallback to generic import if ESM import fails
-      console.error("Failed to load Mermaid ESM build, falling back to generic import:", esmError);
+      console.warn("Failed to load Mermaid ESM build, falling back to generic import:", esmError);
       mermaidModule = await import("mermaid");
     }
     
     // Normalize the import result (some bundles expose default, some the module directly)
     const mermaid = mermaidModule?.default ?? mermaidModule;
+    
+    // Safety check: ensure mermaid instance was resolved
+    if (!mermaid) {
+      throw new Error("Failed to load Mermaid: module resolved to undefined");
+    }
     
     // Runtime verification log
     console.debug("Mermaid loaded", (mermaid as { version?: string })?.version ?? "unknown");
