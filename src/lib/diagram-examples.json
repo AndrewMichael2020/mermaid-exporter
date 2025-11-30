@@ -62,9 +62,5 @@
   {
     "key": "cancer-biomarker-radar",
     "code": "---\ntitle: \"Cancer Biomarker Panel Comparison\"\n---\nradar-beta\n  axis ctDNA[\"ctDNA (mutant fragments %)\"], cea[\"CEA (ng/mL-normalized)\"], ca125[\"CA-125 (index)\"]\n  axis pd1[\"PD-L1 (% tumor cells)\"], tcell[\"Tumor CD8+ T-cell density\"], neoantigen[\"Predicted neoantigen score\"]\n  curve a[\"Protocol A\"]{40, 65, 55, 30, 72, 48}\n  curve b[\"Protocol B\"]{58, 52, 62, 68, 55, 66}\n  max 100\n  min 0"
-  },
-  {
-    "key": "hospital-patient-flow-sankey",
-    "code": "---\nconfig:\n  sankey:\n    showValues: true\n---\nsankey-beta\n\nED Triage,ED Treatment Area,3400\nED Treatment Area,Discharged Home,2100\nED Treatment Area,Admitted - Medicine Ward,700\nED Treatment Area,Admitted - Surgery,300\nED Treatment Area,Observation Unit,200\nAdmitted - Medicine Ward,ICU Transfer,60\nAdmitted - Surgery,ICU Transfer,25\nAdmitted - Medicine Ward,Discharged after Admission,620\nAdmitted - Surgery,Discharged after Admission,265"
   }
 ]
