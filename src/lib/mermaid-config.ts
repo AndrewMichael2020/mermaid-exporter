@@ -26,10 +26,37 @@ const suppressedParseErrorHandler = (err: unknown) => {
 /**
  * Dynamically imports and configures the mermaid instance with error suppression.
  * This ensures `parseError` is set before any rendering occurs.
+ * 
+ * Explicitly imports the ESM build based on NODE_ENV to ensure full modern
+ * diagram support (radar-beta, sankey-beta, quadrantChart, etc.).
  */
 export async function getMermaidInstance() {
   if (!mermaidInstance) {
-    const mermaid = (await import("mermaid")).default;
+    let mermaidModule;
+    
+    // Explicitly import ESM build for full modern diagram support
+    try {
+      if (process.env.NODE_ENV === "production") {
+        mermaidModule = await import("mermaid/dist/mermaid.esm.min.mjs");
+      } else {
+        mermaidModule = await import("mermaid/dist/mermaid.esm.mjs");
+      }
+    } catch (esmError) {
+      // Fallback to generic import if ESM import fails
+      console.warn("Failed to load Mermaid ESM build, falling back to generic import:", esmError);
+      mermaidModule = await import("mermaid");
+    }
+    
+    // Normalize the import result (some bundles expose default, some the module directly)
+    const mermaid = mermaidModule?.default ?? mermaidModule;
+    
+    // Safety check: ensure mermaid instance was resolved
+    if (!mermaid) {
+      throw new Error("Failed to load Mermaid: module resolved to undefined");
+    }
+    
+    // Runtime verification log
+    console.debug("Mermaid loaded", (mermaid as { version?: string })?.version ?? "unknown");
     
     // Override the global parseError handler to suppress DOM error widgets
     // This must be done before any initialization to prevent the "bomb" icons
