@@ -118,12 +118,5 @@ export const diagramExamples: DiagramExample[] = [
     category: "Public Health",
     diagramType: "quadrantChart",
     code: getCode('vaccine-outreach-quadrant')
-  },
-  {
-    title: "[sankey-beta] Hospital Patient Flow Sankey",
-    description: "Visualizes patient throughput from Emergency Department triage to disposition (admit to ward, surgery, observation, discharge) for a typical month. Useful for capacity planning.",
-    category: "Clinical Workflow",
-    diagramType: "sankey-beta",
-    code: getCode('hospital-patient-flow-sankey')
   }
 ];
